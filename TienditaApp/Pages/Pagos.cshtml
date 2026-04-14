@@ -1,0 +1,42 @@
+@page
+@model TienditaApp.Pages.PagosModel
+
+<h1>Pagos 💸</h1>
+
+<form method="post">
+    <select asp-for="VentaId">
+        @foreach (var v in Model.Ventas)
+        {
+            <option value="@v.Id">
+                @v.ClienteNombre - Debe: $@(v.Total - v.Pagado)
+            </option>
+        }
+    </select>
+
+    <input asp-for="Monto" placeholder="Monto a pagar" />
+
+    <button type="submit">Pagar</button>
+</form>
+
+<hr />
+
+<h2>Deudas</h2>
+
+<table border="1">
+    <tr>
+        <th>Cliente</th>
+        <th>Total</th>
+        <th>Pagado</th>
+        <th>Debe</th>
+    </tr>
+
+    @foreach (var v in Model.Ventas)
+    {
+        <tr>
+            <td>@v.ClienteNombre</td>
+            <td>@v.Total</td>
+            <td>@v.Pagado</td>
+            <td>@(v.Total - v.Pagado)</td>
+        </tr>
+    }
+</table>

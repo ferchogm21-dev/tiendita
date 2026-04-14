@@ -1,0 +1,79 @@
+@page
+@model TienditaApp.Pages.VentasModel
+
+
+<h1>Ventas 🧾</h1>
+
+<form method="post">
+
+    <label>Cliente:</label>
+    <select asp-for="ClienteId">
+        @foreach (var c in Model.Clientes)
+        {
+            <option value="@c.Id">@c.Nombre</option>
+        }
+    </select>
+
+    <br /><br />
+
+    <label>Producto:</label>
+    <select asp-for="ProductoId">
+        @foreach (var p in Model.Productos)
+        {
+            <option value="@p.Id">
+                @p.Nombre - $@p.Precio (Stock: @p.Stock)
+            </option>
+        }
+    </select>
+
+    <br /><br />
+
+    <input asp-for="Cantidad" placeholder="Cantidad" />
+
+    <br /><br />
+
+    <label>
+        <input type="checkbox" asp-for="EsCredito" />
+        Venta a crédito (fiado)
+    </label>
+
+    <br /><br />
+
+    <button type="submit">Vender</button>
+</form>
+
+<hr />
+
+<h2>Ventas realizadas</h2>
+
+<table border="1">
+    <tr>
+        <th>Cliente</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+    </tr>
+
+    @foreach (var v in Model.Ventas)
+    {
+        <td>
+        @if (v.EsCredito && v.Pagado < v.Total)
+            {
+                <span style="color:red;">Debe</span>
+            }
+            else
+            {
+                <span style="color:green;">Pagado</span>
+            }
+        </td>
+        <tr>
+            <td>@v.ClienteNombre</td>
+            <td>@v.ProductoNombre</td>
+            <td>@v.Cantidad</td>
+            <td>@v.Total</td>
+            <td>@v.Fecha</td>
+        </tr>
+    }
+</table>

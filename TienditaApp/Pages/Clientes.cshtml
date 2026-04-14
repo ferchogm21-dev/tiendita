@@ -1,0 +1,67 @@
+@page
+@model TienditaApp.Pages.ClientesModel
+
+
+<h1>Clientes 👤</h1>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+</style>
+
+<form method="post">
+    <input asp-for="Cliente.Nombre" placeholder="Nombre del cliente" />
+    <input asp-for="Cliente.Telefono" placeholder="Teléfono" />
+
+    <button type="submit">Guardar</button>
+</form>
+
+<hr />
+
+<h2>Lista de clientes</h2>
+
+<table style="width:100%; border-collapse: collapse;">
+    <tr style="background:#198754; color:white;">
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Acciones</th>
+    </tr>
+
+    @foreach (var c in Model.Lista)
+    {
+        <tr style="text-align:center;">
+            <td>@c.Nombre</td>
+            <td>@c.Telefono</td>
+            <td>
+                <form method="post" style="display:inline;">
+                    <button formaction="?handler=Eliminar&id=@c.Id" style="background:red;color:white;">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
