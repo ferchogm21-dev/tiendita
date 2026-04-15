@@ -16,33 +16,107 @@ namespace TienditaApp.Pages
         }
 
         [BindProperty]
-        public int VentaId { get; set; }
+        public int ClienteId { get; set; }
 
         [BindProperty]
-        public decimal Monto { get; set; }
+        public decimal Abono { get; set; }
 
-        public List<Venta> Ventas { get; set; }
+        public List<ClienteDeuda> DeudasCliente { get; set; } = new();
+        public List<Venta> VentasCliente { get; set; } = new();
 
-        public void OnGet()
+        public string ClienteNombreActual { get; set; } = "";
+        public int? ClienteIdActual { get; set; }
+
+        // ✅ SOLO UN OnGet
+        public void OnGet(int? clienteId)
         {
-            Ventas = _context.Ventas
-                .Where(v => v.EsCredito && v.Pagado < v.Total)
-                .ToList();
+            CargarDeudas();
+
+            if (clienteId.HasValue)
+            {
+                ClienteIdActual = clienteId;
+
+                ClienteNombreActual = _context.Clientes
+                    .Where(c => c.Id == clienteId)
+                    .Select(c => c.Nombre)
+                    .FirstOrDefault() ?? "";
+
+                VentasCliente = _context.Ventas
+                    .Where(v => v.ClienteId == clienteId && v.EsCredito)
+                    .ToList();
+            }
         }
 
-        public void OnPost()
+        public IActionResult OnPostAbonar()
         {
-            var venta = _context.Ventas.FirstOrDefault(v => v.Id == VentaId);
+            var ventas = _context.Ventas
+                .Where(v => v.ClienteId == ClienteId && v.EsCredito && v.Pagado < v.Total)
+                .OrderBy(v => v.Id)
+                .ToList();
 
-            if (venta != null)
+            decimal restante = Abono;
+
+            foreach (var v in ventas)
             {
-                venta.Pagado += Monto;
-                _context.SaveChanges();
+                if (restante <= 0) break;
+
+                decimal deuda = v.Total - v.Pagado;
+
+                if (restante >= deuda)
+                {
+                    v.Pagado = v.Total;
+                    restante -= deuda;
+                }
+                else
+                {
+                    v.Pagado += restante;
+                    restante = 0;
+                }
             }
 
-            Ventas = _context.Ventas
-                .Where(v => v.EsCredito && v.Pagado < v.Total)
+            _context.SaveChanges();
+
+            return RedirectToPage(new { clienteId = ClienteId });
+        }
+
+        public IActionResult OnPostLiquidarCliente(int clienteId)
+        {
+            var ventas = _context.Ventas
+                .Where(v => v.ClienteId == clienteId && v.EsCredito)
+                .ToList();
+
+            foreach (var v in ventas)
+            {
+                v.Pagado = v.Total;
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToPage(new { clienteId });
+        }
+
+        private void CargarDeudas()
+        {
+            DeudasCliente = _context.Ventas
+                .Where(v => v.EsCredito)
+                .GroupBy(v => new { v.ClienteId, v.ClienteNombre })
+                .Select(g => new ClienteDeuda
+                {
+                    ClienteId = g.Key.ClienteId,
+                    ClienteNombre = g.Key.ClienteNombre,
+                    TotalDeuda = g.Sum(x => x.Total),
+                    TotalPagado = g.Sum(x => x.Pagado)
+                })
                 .ToList();
         }
+    }
+
+    public class ClienteDeuda
+    {
+        public int ClienteId { get; set; }
+        public string ClienteNombre { get; set; } = "";
+        public decimal TotalDeuda { get; set; }
+        public decimal TotalPagado { get; set; }
+        public decimal Debe => TotalDeuda - TotalPagado;
     }
 }

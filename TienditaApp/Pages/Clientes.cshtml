@@ -1,7 +1,6 @@
 @page
 @model TienditaApp.Pages.ClientesModel
 
-
 <h1>Clientes 👤</h1>
 
 <style>
@@ -32,36 +31,53 @@
     }
 </style>
 
+<!-- FORMULARIO -->
 <form method="post">
+    <input asp-for="Cliente.Id" type="hidden" />
+
     <input asp-for="Cliente.Nombre" placeholder="Nombre del cliente" />
     <input asp-for="Cliente.Telefono" placeholder="Teléfono" />
 
-    <button type="submit">Guardar</button>
+    <button type="submit">
+        @(Model.Cliente != null && Model.Cliente.Id > 0 ? "Actualizar" : "Guardar")
+    </button>
 </form>
 
 <hr />
 
 <h2>Lista de clientes</h2>
 
-<table style="width:100%; border-collapse: collapse;">
+<table>
     <tr style="background:#198754; color:white;">
         <th>Nombre</th>
         <th>Teléfono</th>
         <th>Acciones</th>
     </tr>
 
-    @foreach (var c in Model.Lista)
-    {
-        <tr style="text-align:center;">
-            <td>@c.Nombre</td>
-            <td>@c.Telefono</td>
-            <td>
-                <form method="post" style="display:inline;">
-                    <button formaction="?handler=Eliminar&id=@c.Id" style="background:red;color:white;">
-                        Eliminar
-                    </button>
-                </form>
-            </td>
-        </tr>
-    }
+@foreach (var item in Model.Lista)
+{
+    <tr style="text-align:center;">
+        <td>@item.Nombre</td>
+        <td>@item.Telefono</td>
+        <td>
+
+            <!-- ✏️ EDITAR (usa GET con id) -->
+            <a asp-page="./Clientes"
+   asp-route-id="@item.Id"
+   style="background:#0d6efd;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;">
+   ✏️ Editar
+</a>
+
+            <!-- 🗑 ELIMINAR -->
+            <form method="post" style="display:inline;">
+                <button type="submit"
+                        formaction="?handler=Eliminar&id=@item.Id"
+                        style="background:red;color:white;">
+                    Eliminar
+                </button>
+            </form>
+
+        </td>
+    </tr>
+}
 </table>

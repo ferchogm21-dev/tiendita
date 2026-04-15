@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TienditaApp.Data;
 using TienditaApp.Models;
-using System.Linq;
 
 namespace TienditaApp.Pages
 {
@@ -16,35 +15,67 @@ namespace TienditaApp.Pages
         }
 
         [BindProperty]
-        public Cliente Cliente { get; set; }
+        public Cliente Cliente { get; set; } = new Cliente();
 
-        public List<Cliente> Lista { get; set; }
+        public List<Cliente> Lista { get; set; } = new();
 
-        public void OnGet()
+        public void OnGet(int? id)
+{
+    if (id.HasValue)
+    {
+        var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id.Value);
+
+        if (cliente != null)
         {
-            Lista = _context.Clientes.ToList();
+            Cliente = cliente;
         }
+    }
 
-        public void OnPost()
+    Lista = _context.Clientes.ToList();
+}
+
+        // 🟢 CREAR / EDITAR
+        public IActionResult OnPost()
         {
-            if (Cliente != null)
+            if (Cliente == null)
             {
+                return RedirectToPage();
+            }
+
+            if (Cliente.Id > 0)
+            {
+                // ✏️ EDITAR
+                var clienteDb = _context.Clientes.FirstOrDefault(x => x.Id == Cliente.Id);
+
+                if (clienteDb != null)
+                {
+                    clienteDb.Nombre = Cliente.Nombre;
+                    clienteDb.Telefono = Cliente.Telefono;
+                    _context.SaveChanges();
+                }
+            }
+            else
+            {
+                // ➕ CREAR
                 _context.Clientes.Add(Cliente);
                 _context.SaveChanges();
             }
 
-            Lista = _context.Clientes.ToList();
+            return RedirectToPage();
         }
-        public IActionResult OnPostEliminar(int id)
-{
-    var cliente = _context.Clientes.Find(id);
-    if (cliente != null)
-    {
-        _context.Clientes.Remove(cliente);
-        _context.SaveChanges();
-    }
 
-    return RedirectToPage();
-}
+        // 🗑 ELIMINAR
+        public IActionResult OnPostEliminar(int id)
+        {
+            var cliente = _context.Clientes.Find(id);
+
+            if (cliente != null)
+            {
+                _context.Clientes.Remove(cliente);
+                _context.SaveChanges();
+            }
+
+            return RedirectToPage();
+        }
     }
 }

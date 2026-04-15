@@ -28,24 +28,24 @@ namespace TienditaApp.Pages
 
         // 🔥 EDITAR (GET)
         public IActionResult OnGetEditar(int id)
-{
-    var producto = _context.Productos.FirstOrDefault(x => x.Id == id);
-
-    if (producto != null)
-    {
-        Producto = new Producto
         {
-            Id = producto.Id,
-            Nombre = producto.Nombre,
-            Precio = producto.Precio,
-            Stock = producto.Stock
-        };
-    }
+            var producto = _context.Productos.FirstOrDefault(x => x.Id == id);
 
-    Lista = _context.Productos.ToList();
+            if (producto != null)
+            {
+                Producto = new Producto
+                {
+                    Id = producto.Id,
+                    Nombre = producto.Nombre,
+                    Precio = producto.Precio,
+                    Stock = producto.Stock
+                };
+            }
 
-    return Page();
-}
+            Lista = _context.Productos.ToList();
+
+            return Page();
+        }
 
         // 🔥 GUARDAR / ACTUALIZAR
         public IActionResult OnPost()

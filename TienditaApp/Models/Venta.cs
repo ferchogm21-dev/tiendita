@@ -17,5 +17,6 @@ namespace TienditaApp.Models
         public decimal Pagado { get; set; } = 0; // 👈 NUEVO
 
         public DateTime Fecha { get; set; } = DateTime.Now;
+        public DateTime? FechaPago { get; set; }
     }
 }

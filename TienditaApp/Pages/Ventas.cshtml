@@ -1,12 +1,33 @@
 @page
 @model TienditaApp.Pages.VentasModel
 
-
 <h1>Ventas 🧾</h1>
+
+<style>
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th, td { padding:10px; border-bottom:1px solid #ddd; text-align:center; }
+    th { background:#198754; color:white; }
+
+    select, input {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+    }
+
+    button {
+        background:#198754;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:5px;
+    }
+
+    .debe { color:red; font-weight:bold; }
+    .pagado { color:green; font-weight:bold; }
+</style>
 
 <form method="post">
 
-    <label>Cliente:</label>
     <select asp-for="ClienteId">
         @foreach (var c in Model.Clientes)
         {
@@ -14,39 +35,29 @@
         }
     </select>
 
-    <br /><br />
-
-    <label>Producto:</label>
     <select asp-for="ProductoId">
         @foreach (var p in Model.Productos)
         {
-            <option value="@p.Id">
-                @p.Nombre - $@p.Precio (Stock: @p.Stock)
-            </option>
+            <option value="@p.Id">@p.Nombre - $@p.Precio</option>
         }
     </select>
 
-    <br /><br />
-
-    <input asp-for="Cantidad" placeholder="Cantidad" />
-
-    <br /><br />
+    <input asp-for="Cantidad" type="number" placeholder="Cantidad" />
 
     <label>
         <input type="checkbox" asp-for="EsCredito" />
-        Venta a crédito (fiado)
+        Crédito
     </label>
 
-    <br /><br />
-
     <button type="submit">Vender</button>
+
 </form>
 
 <hr />
 
-<h2>Ventas realizadas</h2>
+<h2>Ventas</h2>
 
-<table border="1">
+<table>
     <tr>
         <th>Cliente</th>
         <th>Producto</th>
@@ -58,22 +69,22 @@
 
     @foreach (var v in Model.Ventas)
     {
-        <td>
-        @if (v.EsCredito && v.Pagado < v.Total)
-            {
-                <span style="color:red;">Debe</span>
-            }
-            else
-            {
-                <span style="color:green;">Pagado</span>
-            }
-        </td>
         <tr>
             <td>@v.ClienteNombre</td>
             <td>@v.ProductoNombre</td>
             <td>@v.Cantidad</td>
-            <td>@v.Total</td>
-            <td>@v.Fecha</td>
+            <td>$@v.Total</td>
+            <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>
+                @if (v.EsCredito && v.Pagado < v.Total)
+                {
+                    <span class="debe">Debe</span>
+                }
+                else
+                {
+                    <span class="pagado">Pagado</span>
+                }
+            </td>
         </tr>
     }
 </table>

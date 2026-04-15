@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TienditaApp.Data;
 using TienditaApp.Models;
-using System.Linq;
 
 namespace TienditaApp.Pages
 {
@@ -27,18 +26,16 @@ namespace TienditaApp.Pages
         [BindProperty]
         public bool EsCredito { get; set; }
 
-        public List<Producto> Productos { get; set; }
-        public List<Cliente> Clientes { get; set; }
-        public List<Venta> Ventas { get; set; }
+        public List<Producto> Productos { get; set; } = new();
+        public List<Cliente> Clientes { get; set; } = new();
+        public List<Venta> Ventas { get; set; } = new();
 
         public void OnGet()
         {
-            Productos = _context.Productos.ToList();
-            Clientes = _context.Clientes.ToList();
-            Ventas = _context.Ventas.ToList();
+            CargarDatos();
         }
 
-        public void OnPost()
+        public IActionResult OnPost()
         {
             var producto = _context.Productos.FirstOrDefault(p => p.Id == ProductoId);
             var cliente = _context.Clientes.FirstOrDefault(c => c.Id == ClienteId);
@@ -50,18 +47,23 @@ namespace TienditaApp.Pages
                 var venta = new Venta
                 {
                     ProductoNombre = producto.Nombre,
-                    ClienteId = cliente.Id,
                     ClienteNombre = cliente.Nombre,
                     Cantidad = Cantidad,
                     Total = producto.Precio * Cantidad,
                     EsCredito = EsCredito,
-                    Pagado = EsCredito ? 0 : producto.Precio * Cantidad
+                    Pagado = EsCredito ? 0 : producto.Precio * Cantidad,
+                    Fecha = DateTime.Now
                 };
 
                 _context.Ventas.Add(venta);
                 _context.SaveChanges();
             }
 
+            return RedirectToPage();
+        }
+
+        private void CargarDatos()
+        {
             Productos = _context.Productos.ToList();
             Clientes = _context.Clientes.ToList();
             Ventas = _context.Ventas.ToList();
