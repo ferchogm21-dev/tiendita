@@ -42,6 +42,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/workspaces/tiendita/TienditaApp/Pages/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/workspaces/tiendita/TienditaApp/Pages/Pagos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

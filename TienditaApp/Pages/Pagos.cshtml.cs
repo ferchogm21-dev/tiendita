@@ -27,8 +27,9 @@ namespace TienditaApp.Pages
         public string ClienteNombreActual { get; set; } = "";
         public int? ClienteIdActual { get; set; }
 
-        public void OnGet(int? clienteId)
+        public IActionResult OnGet(int? clienteId)
         {
+
             CargarDeudas();
 
             if (clienteId.HasValue)
@@ -44,12 +45,14 @@ namespace TienditaApp.Pages
                     .Where(v => v.ClienteId == clienteId && v.EsFiado == 1)
                     .ToList();
             }
+
+            return Page();
         }
 
         public IActionResult OnPostAbonar()
         {
             var ventas = _context.Ventas
-                .Where(v => v.ClienteId == ClienteId && v.EsFiado == 1 && v.Pagado < v.Total)
+                .Where(v => v.ClienteId == ClienteId && v.EsFiado  == 1 && v.Pagado < v.Total)
                 .OrderBy(v => v.Id)
                 .ToList();
 
@@ -81,7 +84,7 @@ namespace TienditaApp.Pages
         public IActionResult OnPostLiquidarCliente(int clienteId, decimal Abono)
         {
             var ventas = _context.Ventas
-                .Where(v => v.ClienteId == clienteId && v.EsFiado == 1 && v.Pagado < v.Total)
+                .Where(v => v.ClienteId == clienteId && v.EsFiado  == 1 && v.Pagado < v.Total)
                 .OrderBy(v => v.Id)
                 .ToList();
 
@@ -113,7 +116,7 @@ namespace TienditaApp.Pages
         private void CargarDeudas()
         {
             DeudasCliente = _context.Ventas
-                .Where(v => v.EsFiado == 1)
+                .Where(v => v.EsFiado  == 1)
                 .GroupBy(v => v.ClienteId)
                 .Select(g => new ClienteDeuda
                 {
@@ -132,9 +135,12 @@ namespace TienditaApp.Pages
     public class ClienteDeuda
     {
         public int ClienteId { get; set; }
-        public string ClienteNombre { get; set; } = "";
+
+        public string ClienteNombre { get; set; } = ""; // 🔥 AGREGA ESTO
+
         public decimal TotalDeuda { get; set; }
         public decimal TotalPagado { get; set; }
+
         public decimal Debe => TotalDeuda - TotalPagado;
     }
 }

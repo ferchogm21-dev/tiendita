@@ -28,11 +28,15 @@ public class VentasModel : PageModel
 
     public List<VentaDTO> ListaVentas { get; set; } = new();
 
-    public void OnGet()
-    {
-        Productos = _productoRepo.ObtenerTodos().ToList();
-        Clientes = _clienteRepo.ObtenerTodos().ToList();
+    public IActionResult OnGet()
+    {   
+        
+        // 👉 TU LÓGICA NORMAL
         ListaVentas = _ventaRepo.ObtenerVentas();
+        Productos = _productoRepo.ObtenerTodos().ToList();
+        Clientes = _clienteRepo.ObtenerClientes();
+
+        return Page();
     }
 
     public IActionResult OnPost()
@@ -40,4 +44,5 @@ public class VentasModel : PageModel
         _ventaRepo.RegistrarVenta(Venta);
         return RedirectToPage();
     }
+    
 }

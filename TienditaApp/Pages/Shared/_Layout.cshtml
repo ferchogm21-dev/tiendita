@@ -4,43 +4,110 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TienditaApp</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TienditaApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-      <nav style="background:#0d6efd; padding:15px; display:flex; gap:20px; align-items:center;">
 
-    <span style="color:white; font-weight:bold;">
-        🏪 Mi Tiendita
-    </span>
+    @{  
+        var usuario = Context.Session.GetString("Usuario");
+        var esLogin = Context.Request.Path.Value.ToLower().Contains("login");
+    }
+    @* 🔥 HEADER SOLO SI NO ES LOGIN *@
+    @if (!esLogin)
+    {
+        <header>
+            <nav style="background:#0d6efd; padding:15px; display:flex; align-items:center; gap:20px;">
 
-    <a href="/" style="color:white; text-decoration:none;">Inicio</a>
-    <a href="/Productos" style="color:white; text-decoration:none;">Productos</a>
-    <a href="/Clientes" style="color:white; text-decoration:none;">Clientes</a>
-    <a href="/Ventas" style="color:white; text-decoration:none;">Ventas</a>
-    <a href="/Pagos" style="color:white; text-decoration:none;">Pagos</a>
+                <span style="color:white; font-weight:bold;">
+                    🏪 Mi Tiendita
+                </span>
 
-</nav>
-    </header>
+                <a href="/Index" style="color:white; text-decoration:none;">Inicio</a>
+                <a href="/Productos" style="color:white; text-decoration:none;">Productos</a>
+                <a href="/Clientes" style="color:white; text-decoration:none;">Clientes</a>
+                <a href="/Ventas" style="color:white; text-decoration:none;">Ventas</a>
+                <a href="/Pagos" style="color:white; text-decoration:none;">Pagos</a>
+
+                <!-- 🔥 USUARIO + DROPDOWN -->
+                <div style="margin-left:auto; position:relative;">
+                    <button onclick="toggleMenu()" style="
+                        background:transparent;
+                        border:none;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    ">
+                        👤 @usuario ▼
+                    </button>
+
+                    <div id="menuUsuario" style="
+                        display:none;
+                        position:absolute;
+                        right:0;
+                        background:white;
+                        border-radius:8px;
+                        box-shadow:0 4px 10px rgba(0,0,0,0.2);
+                        margin-top:10px;
+                        min-width:150px;
+                    ">
+                        <form method="post" asp-page="/Logout">
+                            <button type="submit" style="
+                                width:100%;
+                                padding:10px;
+                                border:none;
+                                background:none;
+                                text-align:left;
+                                cursor:pointer;
+                            ">
+                                🔒 Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </nav>
+        </header>
+    }
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TienditaApp - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+    @* 🔥 FOOTER SOLO SI NO ES LOGIN *@
+    @if (!esLogin)
+    {
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2026 - TienditaApp
+            </div>
+        </footer>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById("menuUsuario");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    // cerrar si haces clic fuera
+    window.onclick = function(e) {
+        if (!e.target.closest('#menuUsuario') && !e.target.closest('button')) {
+            const menu = document.getElementById("menuUsuario");
+            if (menu) menu.style.display = "none";
+        }
+    }
+</script>
+
 </body>
 </html>

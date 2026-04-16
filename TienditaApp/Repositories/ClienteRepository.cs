@@ -11,10 +11,10 @@ public class ClienteRepository
         _context = context;
     }
 
-    public IEnumerable<Cliente> ObtenerTodos()
+    public List<Cliente> ObtenerClientes()
     {
         using var connection = _context.CreateConnection();
-        return connection.Query<Cliente>("SELECT * FROM Clientes");
+        return connection.Query<Cliente>("SELECT * FROM Clientes").ToList();
     }
 
     public void Insertar(Cliente cliente)

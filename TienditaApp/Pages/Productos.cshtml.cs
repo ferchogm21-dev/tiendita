@@ -21,9 +21,11 @@ namespace TienditaApp.Pages
 
         public List<Producto> Lista { get; set; } = new();
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+
             Lista = _context.Productos.ToList();
+            return Page();
         }
 
         public IActionResult OnPost()

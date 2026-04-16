@@ -20,19 +20,19 @@ namespace TienditaApp.Pages
         public List<Cliente> Lista { get; set; } = new();
 
         public void OnGet(int? id)
-{
-    if (id.HasValue)
-    {
-        var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id.Value);
-
-        if (cliente != null)
         {
-            Cliente = cliente;
-        }
-    }
+            if (id.HasValue)
+            {
+                var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id.Value);
 
-    Lista = _context.Clientes.ToList();
-}
+                if (cliente != null)
+                {
+                    Cliente = cliente;
+                }
+            }
+
+            Lista = _context.Clientes.ToList();
+        }
 
         // 🟢 CREAR / EDITAR
         public IActionResult OnPost()
