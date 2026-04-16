@@ -1,72 +1,43 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TienditaApp.Data;
 using TienditaApp.Models;
+using TienditaApp.Data;
+using System.Linq;
+using TienditaApp.Repositories;
 
-namespace TienditaApp.Pages
+public class VentasModel : PageModel
 {
-    public class VentasModel : PageModel
+    private readonly VentaRepository _ventaRepo;
+    private readonly ProductoRepository _productoRepo;
+    private readonly ClienteRepository _clienteRepo;
+
+    public VentasModel()
     {
-        private readonly AppDbContext _context;
+        var context = new DapperContext();
+        _ventaRepo = new VentaRepository(context);
+        _productoRepo = new ProductoRepository(context);
+        _clienteRepo = new ClienteRepository(context);
+    }
 
-        public VentasModel(AppDbContext context)
-        {
-            _context = context;
-        }
+    [BindProperty]
+    public Venta Venta { get; set; } = new();
 
-        [BindProperty]
-        public int ProductoId { get; set; }
+    public List<Producto> Productos { get; set; } = new();
+    public List<Cliente> Clientes { get; set; } = new();
+    
 
-        [BindProperty]
-        public int ClienteId { get; set; }
+    public List<VentaDTO> ListaVentas { get; set; } = new();
 
-        [BindProperty]
-        public int Cantidad { get; set; }
+    public void OnGet()
+    {
+        Productos = _productoRepo.ObtenerTodos().ToList();
+        Clientes = _clienteRepo.ObtenerTodos().ToList();
+        ListaVentas = _ventaRepo.ObtenerVentas();
+    }
 
-        [BindProperty]
-        public bool EsCredito { get; set; }
-
-        public List<Producto> Productos { get; set; } = new();
-        public List<Cliente> Clientes { get; set; } = new();
-        public List<Venta> Ventas { get; set; } = new();
-
-        public void OnGet()
-        {
-            CargarDatos();
-        }
-
-        public IActionResult OnPost()
-        {
-            var producto = _context.Productos.FirstOrDefault(p => p.Id == ProductoId);
-            var cliente = _context.Clientes.FirstOrDefault(c => c.Id == ClienteId);
-
-            if (producto != null && cliente != null && producto.Stock >= Cantidad)
-            {
-                producto.Stock -= Cantidad;
-
-                var venta = new Venta
-                {
-                    ProductoNombre = producto.Nombre,
-                    ClienteNombre = cliente.Nombre,
-                    Cantidad = Cantidad,
-                    Total = producto.Precio * Cantidad,
-                    EsCredito = EsCredito,
-                    Pagado = EsCredito ? 0 : producto.Precio * Cantidad,
-                    Fecha = DateTime.Now
-                };
-
-                _context.Ventas.Add(venta);
-                _context.SaveChanges();
-            }
-
-            return RedirectToPage();
-        }
-
-        private void CargarDatos()
-        {
-            Productos = _context.Productos.ToList();
-            Clientes = _context.Clientes.ToList();
-            Ventas = _context.Ventas.ToList();
-        }
+    public IActionResult OnPost()
+    {
+        _ventaRepo.RegistrarVenta(Venta);
+        return RedirectToPage();
     }
 }

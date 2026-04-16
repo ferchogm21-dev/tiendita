@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TienditaApp.Models;
 using TienditaApp.Data;
@@ -15,24 +14,10 @@ namespace TienditaApp.Pages
             _context = context;
         }
 
-        [BindProperty]
-        public Producto Producto { get; set; }
-
-        public List<Producto> Lista { get; set; }
+        public List<Producto> Lista { get; set; } = new(); // 🔥 SOLUCIÓN
 
         public void OnGet()
         {
-            Lista = _context.Productos.ToList();
-        }
-
-        public void OnPost()
-        {
-            if (Producto != null)
-            {
-                _context.Productos.Add(Producto);
-                _context.SaveChanges();
-            }
-
             Lista = _context.Productos.ToList();
         }
     }

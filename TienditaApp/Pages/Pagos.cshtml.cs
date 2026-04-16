@@ -27,7 +27,6 @@ namespace TienditaApp.Pages
         public string ClienteNombreActual { get; set; } = "";
         public int? ClienteIdActual { get; set; }
 
-        // ✅ SOLO UN OnGet
         public void OnGet(int? clienteId)
         {
             CargarDeudas();
@@ -42,7 +41,7 @@ namespace TienditaApp.Pages
                     .FirstOrDefault() ?? "";
 
                 VentasCliente = _context.Ventas
-                    .Where(v => v.ClienteId == clienteId && v.EsCredito)
+                    .Where(v => v.ClienteId == clienteId && v.EsFiado == 1)
                     .ToList();
             }
         }
@@ -50,7 +49,7 @@ namespace TienditaApp.Pages
         public IActionResult OnPostAbonar()
         {
             var ventas = _context.Ventas
-                .Where(v => v.ClienteId == ClienteId && v.EsCredito && v.Pagado < v.Total)
+                .Where(v => v.ClienteId == ClienteId && v.EsFiado == 1 && v.Pagado < v.Total)
                 .OrderBy(v => v.Id)
                 .ToList();
 
@@ -79,15 +78,31 @@ namespace TienditaApp.Pages
             return RedirectToPage(new { clienteId = ClienteId });
         }
 
-        public IActionResult OnPostLiquidarCliente(int clienteId)
+        public IActionResult OnPostLiquidarCliente(int clienteId, decimal Abono)
         {
             var ventas = _context.Ventas
-                .Where(v => v.ClienteId == clienteId && v.EsCredito)
+                .Where(v => v.ClienteId == clienteId && v.EsFiado == 1 && v.Pagado < v.Total)
+                .OrderBy(v => v.Id)
                 .ToList();
+
+            decimal restante = Abono;
 
             foreach (var v in ventas)
             {
-                v.Pagado = v.Total;
+                if (restante <= 0) break;
+
+                decimal deuda = v.Total - v.Pagado;
+
+                if (restante >= deuda)
+                {
+                    v.Pagado = v.Total;
+                    restante -= deuda;
+                }
+                else
+                {
+                    v.Pagado += restante;
+                    restante = 0;
+                }
             }
 
             _context.SaveChanges();
@@ -98,12 +113,15 @@ namespace TienditaApp.Pages
         private void CargarDeudas()
         {
             DeudasCliente = _context.Ventas
-                .Where(v => v.EsCredito)
-                .GroupBy(v => new { v.ClienteId, v.ClienteNombre })
+                .Where(v => v.EsFiado == 1)
+                .GroupBy(v => v.ClienteId)
                 .Select(g => new ClienteDeuda
                 {
-                    ClienteId = g.Key.ClienteId,
-                    ClienteNombre = g.Key.ClienteNombre,
+                    ClienteId = g.Key,
+                    ClienteNombre = _context.Clientes
+                        .Where(c => c.Id == g.Key)
+                        .Select(c => c.Nombre)
+                        .FirstOrDefault() ?? "",
                     TotalDeuda = g.Sum(x => x.Total),
                     TotalPagado = g.Sum(x => x.Pagado)
                 })

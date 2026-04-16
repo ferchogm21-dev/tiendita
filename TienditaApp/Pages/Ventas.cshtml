@@ -1,90 +1,256 @@
 @page
-@model TienditaApp.Pages.VentasModel
-
-<h1>Ventas 🧾</h1>
+@model VentasModel
 
 <style>
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th, td { padding:10px; border-bottom:1px solid #ddd; text-align:center; }
-    th { background:#198754; color:white; }
+body {
+    background: #f5f7fa;
+    font-family: Arial, sans-serif;
+}
 
-    select, input {
-        width: 100%;
-        padding: 8px;
-        margin: 5px 0;
-    }
+/* CARD */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
 
-    button {
-        background:#198754;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:5px;
-    }
+/* INPUTS */
+select, input {
+    padding: 10px;
+    margin: 8px 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 220px;
+}
 
-    .debe { color:red; font-weight:bold; }
-    .pagado { color:green; font-weight:bold; }
+/* BOTÓN */
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #198754;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* INFO */
+.info {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* STOCK */
+.stock { color: green; }
+.bajo-stock { color: red; }
+
+/* TABLA */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th {
+    background: #0d6efd;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* 🔥 TIPO DE VENTA MODERNO */
+.tipo-venta {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.tipo-venta label {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.tipo-venta input {
+    display: none;
+}
+
+/* CONTADO */
+.tipo-venta label:first-child:has(input:checked) {
+    background: #198754;
+    color: white;
+    border-color: #198754;
+}
+
+/* FIADO */
+.tipo-venta label:last-child:has(input:checked) {
+    background: #ffc107;
+    color: black;
+    border-color: #ffc107;
+}
 </style>
 
-<form method="post">
+<h1>🧾 Ventas</h1>
 
-    <select asp-for="ClienteId">
+<div class="card">
+
+<form method="post" onsubmit="return validarVenta()">
+
+    <select id="productoSelect" name="Venta.ProductoId">
+        <option value="">Selecciona producto</option>
+        @foreach (var p in Model.Productos)
+        {
+            <option value="@p.Id" data-precio="@p.Precio" data-stock="@p.Stock">
+                @p.Nombre
+            </option>
+        }
+    </select>
+
+    <select name="Venta.ClienteId">
+        <option value="">Selecciona cliente</option>
         @foreach (var c in Model.Clientes)
         {
             <option value="@c.Id">@c.Nombre</option>
         }
     </select>
 
-    <select asp-for="ProductoId">
-        @foreach (var p in Model.Productos)
-        {
-            <option value="@p.Id">@p.Nombre - $@p.Precio</option>
-        }
-    </select>
+    <input type="number" id="cantidad" name="Venta.Cantidad" placeholder="Cantidad" />
 
-    <input asp-for="Cantidad" type="number" placeholder="Cantidad" />
+    <!-- 🔥 TIPO DE VENTA -->
+    <div class="tipo-venta">
+        <label>
+            <input type="radio" name="Venta.EsFiado" value="0" checked />
+            💵 Contado
+        </label>
 
-    <label>
-        <input type="checkbox" asp-for="EsCredito" />
-        Crédito
-    </label>
+        <label>
+            <input type="radio" name="Venta.EsFiado" value="1" />
+            🧾 Fiado
+        </label>
+    </div>
 
-    <button type="submit">Vender</button>
+    <div class="info">
+        Precio: $<span id="precio">0</span> |
+        Stock: <span id="stock">0</span> |
+        Total: $<span id="total">0</span>
+    </div>
+
+    <br />
+
+    <button type="submit" id="btnVender">💰 Vender</button>
 
 </form>
 
+</div>
+
 <hr />
 
-<h2>Ventas</h2>
+<h2>📊 Historial</h2>
 
 <table>
     <tr>
-        <th>Cliente</th>
         <th>Producto</th>
+        <th>Cliente</th>
         <th>Cantidad</th>
-        <th>Total</th>
+        <th>Tipo</th>
         <th>Fecha</th>
-        <th>Estado</th>
+        <th>Total</th>
     </tr>
 
-    @foreach (var v in Model.Ventas)
+    @foreach (var v in Model.ListaVentas)
     {
         <tr>
-            <td>@v.ClienteNombre</td>
-            <td>@v.ProductoNombre</td>
-            <td>@v.Cantidad</td>
-            <td>$@v.Total</td>
-            <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@v.Producto</td>
+            <td>@v.Cliente</td>
+            <td>@v.Cantidad</td>            
             <td>
-                @if (v.EsCredito && v.Pagado < v.Total)
+                @if (v.EsFiado == 1)
                 {
-                    <span class="debe">Debe</span>
+                    <span style="background:#ffc107; padding:5px 10px; border-radius:10px;">
+                        🧾 Fiado
+                    </span>
                 }
                 else
                 {
-                    <span class="pagado">Pagado</span>
+                    <span style="background:#198754; color:white; padding:5px 10px; border-radius:10px;">
+                        💵 Contado
+                    </span>
                 }
             </td>
+            <td>@DateTime.Parse(v.Fecha).ToString("dd/MM/yyyy HH:mm")</td>
+            <td>$@v.Total</td>
         </tr>
     }
 </table>
+
+<script>
+const productoSelect = document.getElementById("productoSelect");
+const cantidadInput = document.getElementById("cantidad");
+const precioSpan = document.getElementById("precio");
+const stockSpan = document.getElementById("stock");
+const totalSpan = document.getElementById("total");
+const boton = document.getElementById("btnVender");
+
+function actualizarInfo() {
+    const selected = productoSelect.options[productoSelect.selectedIndex];
+
+    const precio = parseFloat(selected.getAttribute("data-precio")) || 0;
+    const stock = parseInt(selected.getAttribute("data-stock")) || 0;
+    const cantidad = parseInt(cantidadInput.value) || 0;
+
+    precioSpan.textContent = precio;
+    stockSpan.textContent = stock;
+    totalSpan.textContent = precio * cantidad;
+
+    stockSpan.className = stock <= 5 ? "bajo-stock" : "stock";
+
+    if (stock === 0 || cantidad > stock || cantidad <= 0) {
+        boton.disabled = true;
+        boton.style.background = "gray";
+    } else {
+        boton.disabled = false;
+        boton.style.background = "#198754";
+    }
+}
+
+function validarVenta() {
+    const selected = productoSelect.options[productoSelect.selectedIndex];
+
+    const stock = parseInt(selected.getAttribute("data-stock")) || 0;
+    const cantidad = parseInt(cantidadInput.value) || 0;
+
+    if (stock === 0) {
+        alert("❌ No hay stock disponible");
+        return false;
+    }
+
+    if (cantidad > stock) {
+        alert("⚠️ Stock insuficiente");
+        return false;
+    }
+
+    return true;
+}
+
+productoSelect.addEventListener("change", actualizarInfo);
+cantidadInput.addEventListener("input", actualizarInfo);
+</script>

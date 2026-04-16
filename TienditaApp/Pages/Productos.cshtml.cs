@@ -15,61 +15,45 @@ namespace TienditaApp.Pages
             _context = context;
         }
 
+        // 🔥 AQUÍ VA (IMPORTANTE)
         [BindProperty]
         public Producto Producto { get; set; } = new Producto();
 
-        public List<Producto> Lista { get; set; } = new List<Producto>();
+        public List<Producto> Lista { get; set; } = new();
 
-        // 🔹 Cargar página
         public void OnGet()
         {
             Lista = _context.Productos.ToList();
         }
 
-        // 🔥 EDITAR (GET)
-        public IActionResult OnGetEditar(int id)
-        {
-            var producto = _context.Productos.FirstOrDefault(x => x.Id == id);
-
-            if (producto != null)
-            {
-                Producto = new Producto
-                {
-                    Id = producto.Id,
-                    Nombre = producto.Nombre,
-                    Precio = producto.Precio,
-                    Stock = producto.Stock
-                };
-            }
-
-            Lista = _context.Productos.ToList();
-
-            return Page();
-        }
-
-        // 🔥 GUARDAR / ACTUALIZAR
         public IActionResult OnPost()
         {
-            var prod = _context.Productos
-                .FirstOrDefault(x => x.Id == Producto.Id);
-
-            if (prod == null)
+            if (Producto.Id == 0)
             {
                 _context.Productos.Add(Producto);
             }
             else
             {
-                prod.Nombre = Producto.Nombre;
-                prod.Precio = Producto.Precio;
-                prod.Stock = Producto.Stock;
+                _context.Productos.Update(Producto);
             }
 
             _context.SaveChanges();
-
             return RedirectToPage();
         }
 
-        // 🗑 ELIMINAR
+        public IActionResult OnGetEditar(int id)
+        {
+            var producto = _context.Productos.Find(id);
+
+            if (producto != null)
+            {
+                Producto = producto;
+            }
+
+            Lista = _context.Productos.ToList();
+            return Page();
+        }
+
         public IActionResult OnPostEliminar(int id)
         {
             var producto = _context.Productos.Find(id);
