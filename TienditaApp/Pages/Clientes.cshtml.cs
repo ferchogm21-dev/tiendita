@@ -1,81 +1,63 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TienditaApp.Data;
 using TienditaApp.Models;
+using TienditaApp.Repositories;
 
-namespace TienditaApp.Pages
+namespace TienditaApp.Pages;
+
+public class ClientesModel : PageModel
 {
-    public class ClientesModel : PageModel
+    private readonly ClienteRepository _clienteRepo;
+
+    public ClientesModel(ClienteRepository clienteRepo)
     {
-        private readonly DapperContext _context;
+        _clienteRepo = clienteRepo;
+    }
 
-        public ClientesModel(DapperContext context)
+    [BindProperty]
+    public Cliente Cliente { get; set; } = new();
+
+    public List<Cliente> ListaClientes { get; set; } = new();
+
+    // 🔹 GET
+    public void OnGet()
+    {
+        ListaClientes = _clienteRepo.ObtenerClientes();
+    }
+
+    // 🔹 INSERT / UPDATE
+    public IActionResult OnPost()
+    {
+        if (!ModelState.IsValid)
         {
-            _context = context;
+            ListaClientes = _clienteRepo.ObtenerClientes();
+            return Page();
         }
 
-        [BindProperty]
-        public Cliente Cliente { get; set; } = new Cliente();
+        if (Cliente.Id == 0)
+            _clienteRepo.Agregar(Cliente);
+        else
+            _clienteRepo.Actualizar(Cliente);
 
-        public List<Cliente> Lista { get; set; } = new();
+        TempData["Mensaje"] = Cliente.Id == 0
+            ? "Cliente guardado correctamente ✅"
+            : "Cliente actualizado correctamente ✏️";
 
-        public void OnGet(int? id)
-        {
-            if (id.HasValue)
-            {
-                var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id.Value);
+        return RedirectToPage();
+    }
 
-                if (cliente != null)
-                {
-                    Cliente = cliente;
-                }
-            }
+    // 🔹 EDITAR
+    public IActionResult OnGetEditar(int id)
+    {
+        Cliente = _clienteRepo.ObtenerPorId(id);
+        ListaClientes = _clienteRepo.ObtenerClientes();
+        return Page();
+    }
 
-            Lista = _context.Clientes.ToList();
-        }
-
-        // 🟢 CREAR / EDITAR
-        public IActionResult OnPost()
-        {
-            if (Cliente == null)
-            {
-                return RedirectToPage();
-            }
-
-            if (Cliente.Id > 0)
-            {
-                // ✏️ EDITAR
-                var clienteDb = _context.Clientes.FirstOrDefault(x => x.Id == Cliente.Id);
-
-                if (clienteDb != null)
-                {
-                    clienteDb.Nombre = Cliente.Nombre;
-                    clienteDb.Telefono = Cliente.Telefono;
-                    _context.SaveChanges();
-                }
-            }
-            else
-            {
-                // ➕ CREAR
-                _context.Clientes.Add(Cliente);
-                _context.SaveChanges();
-            }
-
-            return RedirectToPage();
-        }
-
-        // 🗑 ELIMINAR
-        public IActionResult OnPostEliminar(int id)
-        {
-            var cliente = _context.Clientes.Find(id);
-
-            if (cliente != null)
-            {
-                _context.Clientes.Remove(cliente);
-                _context.SaveChanges();
-            }
-
-            return RedirectToPage();
-        }
+    // 🔹 ELIMINAR
+    public IActionResult OnPostEliminar(int id)
+    {
+        _clienteRepo.Eliminar(id);
+        return RedirectToPage();
     }
 }

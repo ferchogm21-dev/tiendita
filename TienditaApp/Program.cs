@@ -1,10 +1,13 @@
 using TienditaApp.Data;
+using TienditaApp.Repositories;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddDbContext<DapperContext>(options =>
-    options.UseSqlite("Data Source=tienda.db"));
+builder.Services.AddScoped<DapperContext>();
+builder.Services.AddScoped<ProductoRepository>();
+builder.Services.AddScoped<ClienteRepository>();
+builder.Services.AddScoped<VentaRepository>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

@@ -1,6 +1,6 @@
 using Dapper;
-using TienditaApp.Data;
 using TienditaApp.Models;
+using TienditaApp.Data;
 
 public class ClienteRepository
 {
@@ -11,17 +11,46 @@ public class ClienteRepository
         _context = context;
     }
 
+    // 🔹 Obtener todos
     public List<Cliente> ObtenerClientes()
     {
         using var connection = _context.CreateConnection();
-        return connection.Query<Cliente>("SELECT * FROM Clientes").ToList();
+        var sql = "SELECT * FROM Clientes";
+        return connection.Query<Cliente>(sql).ToList();
     }
 
-    public void Insertar(Cliente cliente)
+    // 🔹 Obtener por Id
+    public Cliente ObtenerPorId(int id)
     {
         using var connection = _context.CreateConnection();
-        connection.Execute(
-            "INSERT INTO Clientes (Nombre) VALUES (@Nombre)",
-            cliente);
+        var sql = "SELECT * FROM Clientes WHERE Id = @Id";
+        return connection.QueryFirstOrDefault<Cliente>(sql, new { Id = id }) ?? new Cliente();
+    }
+
+    // 🔹 Insertar
+    public void Agregar(Cliente cliente)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = @"INSERT INTO Clientes (Nombre, Telefono)
+                    VALUES (@Nombre, @Telefono)";
+        connection.Execute(sql, cliente);
+    }
+
+    // 🔹 Actualizar
+    public void Actualizar(Cliente cliente)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = @"UPDATE Clientes 
+                    SET Nombre = @Nombre, Telefono = @Telefono
+                    WHERE Id = @Id";
+        connection.Execute(sql, cliente);
+    }
+
+    // 🔹 Eliminar
+    public void Eliminar(int id)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = "DELETE FROM Clientes WHERE Id = @Id";
+        connection.Execute(sql, new { Id = id });
     }
 }

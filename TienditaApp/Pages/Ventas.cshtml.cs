@@ -11,12 +11,14 @@ public class VentasModel : PageModel
     private readonly ProductoRepository _productoRepo;
     private readonly ClienteRepository _clienteRepo;
 
-    public VentasModel()
+    public VentasModel(
+        VentaRepository ventaRepo,
+        ProductoRepository productoRepo,
+        ClienteRepository clienteRepo)
     {
-        var context = new DapperContext();
-        _ventaRepo = new VentaRepository(context);
-        _productoRepo = new ProductoRepository(context);
-        _clienteRepo = new ClienteRepository(context);
+        _ventaRepo = ventaRepo;
+        _productoRepo = productoRepo;
+        _clienteRepo = clienteRepo;
     }
 
     [BindProperty]
@@ -24,25 +26,20 @@ public class VentasModel : PageModel
 
     public List<Producto> Productos { get; set; } = new();
     public List<Cliente> Clientes { get; set; } = new();
-    
-
     public List<VentaDTO> ListaVentas { get; set; } = new();
 
     public IActionResult OnGet()
-    {   
-        
-        // 👉 TU LÓGICA NORMAL
+    {
         ListaVentas = _ventaRepo.ObtenerVentas();
         Productos = _productoRepo.ObtenerTodos().ToList();
         Clientes = _clienteRepo.ObtenerClientes();
 
         return Page();
     }
-    
+
     public IActionResult OnPost()
     {
         _ventaRepo.RegistrarVenta(Venta);
         return RedirectToPage();
     }
-    
 }

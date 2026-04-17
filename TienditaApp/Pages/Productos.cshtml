@@ -1,4 +1,4 @@
-@page "{handler?}/{id?}"
+@page
 @model TienditaApp.Pages.ProductosModel
 
 <style>
@@ -39,15 +39,29 @@
 <h1>Productos 📦</h1>
 
 <h2>@(Model.Producto.Id == 0 ? "Nuevo Producto" : "Editando Producto")</h2>
+<div asp-validation-summary="All" style="color:red; margin-bottom:10px;"></div>
 
 <form method="post">
 
-    <!-- ID -->
-    <input type="hidden" name="Producto.Id" value="@(Model.Producto?.Id ?? 0)" />
+    <input type="hidden" asp-for="Producto.Id" />
 
-    <input name="Producto.Nombre" value="@(Model.Producto?.Nombre ?? "")" placeholder="Nombre" />
-    <input name="Producto.Precio" value="@(Model.Producto?.Precio ?? 0)" placeholder="Precio" />
-    <input name="Producto.Stock" value="@(Model.Producto?.Stock ?? 0)" placeholder="Stock" />
+    <div>
+        <label>Nombre Producto:</label><br />
+        <input asp-for="Producto.Nombre" placeholder="Nombre" />
+        <span asp-validation-for="Producto.Nombre" style="color:red"></span>
+    </div>
+
+    <div>
+        <label>Precio Producto:</label><br />
+        <input asp-for="Producto.Precio" placeholder="Precio" />
+        <span asp-validation-for="Producto.Precio" style="color:red"></span>
+    </div>
+
+    <div>
+        <label>Stock:</label><br />
+        <input asp-for="Producto.Stock" placeholder="Stock" />
+        <span asp-validation-for="Producto.Stock" style="color:red"></span>
+    </div>
 
     <button type="submit">
         @(Model.Producto.Id == 0 ? "Guardar" : "Actualizar")
@@ -63,28 +77,35 @@
         <th>Stock</th>
         <th>Acciones</th>
     </tr>
-
-    @foreach (var p in Model.Lista)
+    @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    }
+    @if (TempData["Mensaje"] != null)
+{
+    <div style="background:#d4edda; color:#155724; padding:10px; border-radius:5px; margin-bottom:10px;">
+        @TempData["Mensaje"]
+    </div>
+}
+    @foreach (var item in Model.ListaProductos)
     {
         <tr style="text-align:center;">
-            <td>@p.Nombre</td>
-            <td>$@p.Precio</td>
-            <td>@p.Stock</td>
+            <td>@item.Nombre</td>
+            <td>$@item.Precio</td>
+            <td>@item.Stock</td>
             <td>
 
                 <!-- ✏️ EDITAR (MISMO ESTILO PERO GET) -->
-                <form method="get" style="display:inline;">
-                    <button type="submit"
-                            formaction="/Productos/Editar/@p.Id"
-                            style="background:#0d6efd;color:white; padding:5px 10px; border-radius:5px;">
-                        ✏️ Editar
-                    </button>
-                </form>
+                <a asp-page="Productos"
+   asp-page-handler="Editar"
+   asp-route-id="@item.Id"
+   style="background:#0d6efd;color:white; padding:5px 10px; border-radius:5px; text-decoration:none;">
+    ✏️ Editar
+</a>
 
                 <!-- 🗑 ELIMINAR -->
                 <form method="post" style="display:inline;">
                     <button type="submit"
-                            formaction="/Productos?handler=Eliminar&id=@p.Id"
+                            formaction="/Productos?handler=Eliminar&id=@item.Id"
                             style="background:red;color:white; padding:5px 10px; border-radius:5px;">
                         🗑 Eliminar
                     </button>

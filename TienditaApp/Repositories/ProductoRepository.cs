@@ -1,6 +1,8 @@
 using Dapper;
-using TienditaApp.Data;
 using TienditaApp.Models;
+using TienditaApp.Data;
+
+namespace TienditaApp.Repositories;
 
 public class ProductoRepository
 {
@@ -11,38 +13,46 @@ public class ProductoRepository
         _context = context;
     }
 
-    public IEnumerable<Producto> ObtenerTodos()
+    // 🔹 Obtener todos
+    public List<Producto> ObtenerTodos()
     {
         using var connection = _context.CreateConnection();
-        return connection.Query<Producto>("SELECT * FROM Productos");
+        var sql = "SELECT * FROM Productos";
+        return connection.Query<Producto>(sql).ToList();
     }
 
-    public void Insertar(Producto p)
-    {
-        using var connection = _context.CreateConnection();
-        var sql = "INSERT INTO Productos (Nombre, Precio, Stock) VALUES (@Nombre, @Precio, @Stock)";
-        connection.Execute(sql, p);
-    }
-
-    public void Actualizar(Producto p)
-    {
-        using var connection = _context.CreateConnection();
-        var sql = "UPDATE Productos SET Nombre=@Nombre, Precio=@Precio, Stock=@Stock WHERE Id=@Id";
-        connection.Execute(sql, p);
-    }
-
-    public void Eliminar(int id)
-    {
-        using var connection = _context.CreateConnection();
-        connection.Execute("DELETE FROM Productos WHERE Id=@id", new { id });
-    }
-
+    // 🔹 Obtener por Id
     public Producto? ObtenerPorId(int id)
     {
         using var connection = _context.CreateConnection();
+        var sql = "SELECT * FROM Productos WHERE Id = @Id";
+        return connection.QueryFirstOrDefault<Producto>(sql, new { Id = id });
+    }
 
-        return connection.QueryFirstOrDefault<Producto>(
-            "SELECT * FROM Productos WHERE Id = @Id",
-            new { Id = id });
+    // 🔹 Insertar
+    public void Agregar(Producto producto)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = @"INSERT INTO Productos (Nombre, Precio, Stock)
+                    VALUES (@Nombre, @Precio, @Stock)";
+        connection.Execute(sql, producto);
+    }
+
+    // 🔹 Actualizar
+    public void Actualizar(Producto producto)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = @"UPDATE Productos 
+                    SET Nombre = @Nombre, Precio = @Precio, Stock = @Stock
+                    WHERE Id = @Id";
+        connection.Execute(sql, producto);
+    }
+
+    // 🔹 Eliminar
+    public void Eliminar(int id)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = "DELETE FROM Productos WHERE Id = @Id";
+        connection.Execute(sql, new { Id = id });
     }
 }

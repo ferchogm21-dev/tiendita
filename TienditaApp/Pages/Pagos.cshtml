@@ -16,7 +16,6 @@
         <th>Acciones</th>
     </tr>
 
-    
     @foreach (var d in Model.DeudasCliente)
     {
         <tr style="text-align:center;">
@@ -26,7 +25,11 @@
             <td>$@d.TotalPagado</td>
             <td style="color:red;">$@d.Debe</td>
             <td>
-                <a href="/Pagos?clienteId=@d.ClienteId">Ver detalle</a>
+                <!-- ✅ CORREGIDO -->
+                <a asp-page="Pagos"
+                   asp-route-clienteId="@d.ClienteId">
+                    Ver detalles
+                </a>
             </td>
         </tr>
     }
@@ -50,27 +53,37 @@
             <tr style="text-align:center;">
                 <td>$@v.Total</td>
                 <td>$@v.Pagado</td>
-                <td style="color:red;">$@(v.Total - v.Pagado)</td>
+                <td style="color:red;">
+                $@Math.Max(0, v.Total - v.Pagado)
+            </td>
             </tr>
         }
     </table>
 
     <br />
 
-        <form method="post">
-        <input type="hidden" name="ClienteId" value="@Model.ClienteIdActual" />
+    <!-- ✅ FORM CORREGIDO -->
+    <form method="post">
 
-        <input type="number" step="0.01" name="Abono" placeholder="Monto a abonar" />
+        <!-- IMPORTANTE: mantener cliente -->
+        <input type="hidden" name="clienteId" value="@Model.ClienteIdActual" />
+
+        <input type="number" step="0.01" name="abono" placeholder="Monto a abonar" />
 
         <!-- 💰 ABONAR -->
-        <button type="submit" formaction="?handler=Abonar" style="background:#0d6efd;color:white;">
+        <button type="submit"
+                formaction="/Pagos?handler=Abonar"
+                style="background:#0d6efd;color:white;">
             💰 Abonar
         </button>
 
         <!-- 🧾 LIQUIDAR -->
-        <button type="submit" formaction="?handler=LiquidarCliente" style="background:red;color:white;"
+        <button type="submit"
+                formaction="/Pagos?handler=LiquidarCliente"
+                style="background:red;color:white;"
                 onclick="return confirm('¿Seguro que quieres liquidar toda la deuda?')">
             🧾 Liquidar todo
         </button>
+
     </form>
 }

@@ -1,72 +1,63 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TienditaApp.Data;
 using TienditaApp.Models;
-using System.Linq;
+using TienditaApp.Repositories;
 
-namespace TienditaApp.Pages
+namespace TienditaApp.Pages;
+
+public class ProductosModel : PageModel
 {
-    public class ProductosModel : PageModel
+    private readonly ProductoRepository _productoRepo;
+
+    public ProductosModel(ProductoRepository productoRepo)
     {
-        private readonly DapperContext _context;
+        _productoRepo = productoRepo;
+    }
 
-        public ProductosModel(DapperContext context)
+    [BindProperty]
+    public Producto Producto { get; set; } = new() { Nombre = "" };
+
+    public List<Producto> ListaProductos { get; set; } = new();
+
+    // 🔹 GET
+    public void OnGet()
+    {
+        ListaProductos = _productoRepo.ObtenerTodos();
+    }
+
+    // 🔹 INSERT / UPDATE
+    public IActionResult OnPost()
+    {
+        if (!ModelState.IsValid)
         {
-            _context = context;
-        }
-
-        // 🔥 AQUÍ VA (IMPORTANTE)
-        [BindProperty]
-        public Producto Producto { get; set; } = new Producto();
-
-        public List<Producto> Lista { get; set; } = new();
-
-        public IActionResult OnGet()
-        {
-
-            Lista = _context.Productos.ToList();
+            ListaProductos = _productoRepo.ObtenerTodos();
             return Page();
         }
 
-        public IActionResult OnPost()
-        {
-            if (Producto.Id == 0)
-            {
-                _context.Productos.Add(Producto);
-            }
-            else
-            {
-                _context.Productos.Update(Producto);
-            }
+        if (Producto.Id == 0)
+            _productoRepo.Agregar(Producto);
+        else
+            _productoRepo.Actualizar(Producto);
 
-            _context.SaveChanges();
-            return RedirectToPage();
-        }
+        TempData["Mensaje"] = Producto.Id == 0 
+            ? "Producto guardado correctamente ✅"
+            : "Producto actualizado correctamente ✏️";
 
-        public IActionResult OnGetEditar(int id)
-        {
-            var producto = _context.Productos.Find(id);
+        return RedirectToPage();
+    }
 
-            if (producto != null)
-            {
-                Producto = producto;
-            }
+    // 🔹 EDITAR
+    public IActionResult OnGetEditar(int id)
+    {
+        Producto = _productoRepo.ObtenerPorId(id) ?? new() { Nombre = "" };
+        ListaProductos = _productoRepo.ObtenerTodos();
+        return Page();
+    }
 
-            Lista = _context.Productos.ToList();
-            return Page();
-        }
-
-        public IActionResult OnPostEliminar(int id)
-        {
-            var producto = _context.Productos.Find(id);
-
-            if (producto != null)
-            {
-                _context.Productos.Remove(producto);
-                _context.SaveChanges();
-            }
-
-            return RedirectToPage();
-        }
+    // 🔹 ELIMINAR
+    public IActionResult OnPostEliminar(int id)
+    {
+        _productoRepo.Eliminar(id);
+        return RedirectToPage();
     }
 }
