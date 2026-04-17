@@ -115,11 +115,15 @@ td {
 
 <form method="post" onsubmit="return validarVenta()">
 
-    <select id="productoSelect" name="Venta.ProductoNombre">
-        <option value="">Selecciona producto</option>
+    <select id="productoSelect" name="Venta.ProductoId">
+    <option value="">Selecciona producto</option>
+
         @foreach (var p in Model.Productos)
         {
-            <option value="@p.Id" data-precio="@p.Precio" data-stock="@p.Stock">
+            <option 
+                value="@p.Id"
+                data-precio="@p.Precio"
+                data-stock="@p.Stock">
                 @p.Nombre
             </option>
         }
@@ -138,12 +142,12 @@ td {
     <!-- 🔥 TIPO DE VENTA -->
     <div class="tipo-venta">
         <label>
-            <input type="radio" name="Venta.EsFiado" value="0" checked />
+            <input type="radio" name="Venta.EsFiado" value="false" checked />
             💵 Contado
         </label>
 
         <label>
-            <input type="radio" name="Venta.EsFiado" value="1" />
+            <input type="radio" name="Venta.EsFiado" value="true" />
             🧾 Fiado
         </label>
     </div>
@@ -183,7 +187,7 @@ td {
             <td>@v.Cliente</td>
             <td>@v.Cantidad</td>            
             <td>
-                @if (v.EsFiado == 1)
+                @if (v.EsFiado)
                 {
                     <span style="background:#ffc107; padding:5px 10px; border-radius:10px;">
                         🧾 Fiado
@@ -196,7 +200,7 @@ td {
                     </span>
                 }
             </td>
-            <td>@DateTime.Parse(v.Fecha).ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
             <td>$@v.Total</td>
         </tr>
     }
@@ -212,6 +216,14 @@ const boton = document.getElementById("btnVender");
 
 function actualizarInfo() {
     const selected = productoSelect.options[productoSelect.selectedIndex];
+
+    if (!selected || !selected.value) {
+        precioSpan.textContent = 0;
+        stockSpan.textContent = 0;
+        totalSpan.textContent = 0;
+        boton.disabled = true;
+        return;
+    }
 
     const precio = parseFloat(selected.getAttribute("data-precio")) || 0;
     const stock = parseInt(selected.getAttribute("data-stock")) || 0;
@@ -234,6 +246,11 @@ function actualizarInfo() {
 
 function validarVenta() {
     const selected = productoSelect.options[productoSelect.selectedIndex];
+
+    if (!selected || !selected.value) {
+        alert("❌ Selecciona un producto");
+        return false;
+    }
 
     const stock = parseInt(selected.getAttribute("data-stock")) || 0;
     const cantidad = parseInt(cantidadInput.value) || 0;

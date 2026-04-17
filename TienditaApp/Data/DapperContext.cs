@@ -1,5 +1,5 @@
-using Microsoft.Data.Sqlite;
 using System.Data;
+using Microsoft.Data.Sqlite;
 
 namespace TienditaApp.Data
 {
@@ -7,9 +7,9 @@ namespace TienditaApp.Data
     {
         private readonly string _connectionString;
 
-        public DapperContext()
+        public DapperContext(IConfiguration configuration)
         {
-            _connectionString = "Data Source=tienda.db";
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public IDbConnection CreateConnection()

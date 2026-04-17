@@ -1,146 +1,59 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Dapper;
 using TienditaApp.Data;
 using TienditaApp.Models;
-using System.Linq;
 
 namespace TienditaApp.Pages
 {
     public class PagosModel : PageModel
     {
-        private readonly AppDbContext _context;
+        private readonly DapperContext _context;
 
-        public PagosModel(AppDbContext context)
+        public PagosModel(DapperContext context)
         {
             _context = context;
         }
 
-        [BindProperty]
-        public int ClienteId { get; set; }
-
-        [BindProperty]
-        public decimal Abono { get; set; }
-
         public List<ClienteDeuda> DeudasCliente { get; set; } = new();
         public List<Venta> VentasCliente { get; set; } = new();
 
-        public string ClienteNombreActual { get; set; } = "";
         public int? ClienteIdActual { get; set; }
+        public string ClienteNombreActual { get; set; } = "";
 
-        public IActionResult OnGet(int? clienteId)
+        public void OnGet(int? clienteId)
         {
-
             CargarDeudas();
 
             if (clienteId.HasValue)
             {
+                using var conn = _context.CreateConnection();
+
                 ClienteIdActual = clienteId;
 
-                ClienteNombreActual = _context.Clientes
-                    .Where(c => c.Id == clienteId)
-                    .Select(c => c.Nombre)
-                    .FirstOrDefault() ?? "";
+                ClienteNombreActual = conn.QueryFirstOrDefault<string>(
+                    "SELECT Nombre FROM Clientes WHERE Id = @Id",
+                    new { Id = clienteId }) ?? "";
 
-                VentasCliente = _context.Ventas
-                    .Where(v => v.ClienteId == clienteId && v.EsFiado == 1)
-                    .ToList();
+                VentasCliente = conn.Query<Venta>(
+                    "SELECT * FROM Ventas WHERE ClienteId = @Id AND EsFiado = 1",
+                    new { Id = clienteId }).ToList();
             }
-
-            return Page();
-        }
-
-        public IActionResult OnPostAbonar()
-        {
-            var ventas = _context.Ventas
-                .Where(v => v.ClienteId == ClienteId && v.EsFiado  == 1 && v.Pagado < v.Total)
-                .OrderBy(v => v.Id)
-                .ToList();
-
-            decimal restante = Abono;
-
-            foreach (var v in ventas)
-            {
-                if (restante <= 0) break;
-
-                decimal deuda = v.Total - v.Pagado;
-
-                if (restante >= deuda)
-                {
-                    v.Pagado = v.Total;
-                    restante -= deuda;
-                }
-                else
-                {
-                    v.Pagado += restante;
-                    restante = 0;
-                }
-            }
-
-            _context.SaveChanges();
-
-            return RedirectToPage(new { clienteId = ClienteId });
-        }
-
-        public IActionResult OnPostLiquidarCliente(int clienteId, decimal Abono)
-        {
-            var ventas = _context.Ventas
-                .Where(v => v.ClienteId == clienteId && v.EsFiado  == 1 && v.Pagado < v.Total)
-                .OrderBy(v => v.Id)
-                .ToList();
-
-            decimal restante = Abono;
-
-            foreach (var v in ventas)
-            {
-                if (restante <= 0) break;
-
-                decimal deuda = v.Total - v.Pagado;
-
-                if (restante >= deuda)
-                {
-                    v.Pagado = v.Total;
-                    restante -= deuda;
-                }
-                else
-                {
-                    v.Pagado += restante;
-                    restante = 0;
-                }
-            }
-
-            _context.SaveChanges();
-
-            return RedirectToPage(new { clienteId });
         }
 
         private void CargarDeudas()
         {
-            DeudasCliente = _context.Ventas
-                .Where(v => v.EsFiado  == 1)
-                .GroupBy(v => v.ClienteId)
-                .Select(g => new ClienteDeuda
-                {
-                    ClienteId = g.Key,
-                    ClienteNombre = _context.Clientes
-                        .Where(c => c.Id == g.Key)
-                        .Select(c => c.Nombre)
-                        .FirstOrDefault() ?? "",
-                    TotalDeuda = g.Sum(x => x.Total),
-                    TotalPagado = g.Sum(x => x.Pagado)
-                })
-                .ToList();
+            using var conn = _context.CreateConnection();
+
+            DeudasCliente = conn.Query<ClienteDeuda>(@"
+                SELECT 
+                    v.ClienteId,
+                    c.Nombre AS ClienteNombre,
+                    SUM(v.Total) AS TotalDeuda,
+                    SUM(v.Pagado) AS TotalPagado
+                FROM Ventas v
+                LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                WHERE v.EsFiado = 1
+                GROUP BY v.ClienteId, c.Nombre
+            ").ToList();
         }
-    }
-
-    public class ClienteDeuda
-    {
-        public int ClienteId { get; set; }
-
-        public string ClienteNombre { get; set; } = ""; // 🔥 AGREGA ESTO
-
-        public decimal TotalDeuda { get; set; }
-        public decimal TotalPagado { get; set; }
-
-        public decimal Debe => TotalDeuda - TotalPagado;
     }
 }

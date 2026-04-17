@@ -8,9 +8,9 @@ namespace TienditaApp.Pages
 {
     public class ProductosModel : PageModel
     {
-        private readonly AppDbContext _context;
+        private readonly DapperContext _context;
 
-        public ProductosModel(AppDbContext context)
+        public ProductosModel(DapperContext context)
         {
             _context = context;
         }

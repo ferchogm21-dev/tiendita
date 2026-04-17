@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<DapperContext>(options =>
     options.UseSqlite("Data Source=tienda.db"));
 
 // Add services to the container.

@@ -10,7 +10,7 @@ using TienditaApp.Data;
 
 namespace TienditaApp.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(DapperContext))]
     [Migration("20260415002702_AgregarFechaPago")]
     partial class AgregarFechaPago
     {

@@ -10,7 +10,7 @@ using TienditaApp.Data;
 
 namespace TienditaApp.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(DapperContext))]
     [Migration("20260414174139_Ventas")]
     partial class Ventas
     {

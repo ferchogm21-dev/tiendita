@@ -38,7 +38,7 @@ public class VentasModel : PageModel
 
         return Page();
     }
-
+    
     public IActionResult OnPost()
     {
         _ventaRepo.RegistrarVenta(Venta);

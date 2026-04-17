@@ -9,8 +9,8 @@ using TienditaApp.Data;
 
 namespace TienditaApp.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DapperContext))]
+    partial class DapperContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
