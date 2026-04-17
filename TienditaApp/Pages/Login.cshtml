@@ -11,11 +11,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Tiendita</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- ICONOS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <style>
         body {
-            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+        * {
+                box-sizing: border-box;
+            }
+        .input-group input {
+            width: 100%;
+            padding: 12px 65px 12px 38px; /* espacio para iconos */
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .login-container {
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,68 +41,115 @@
         .login-card {
             background: white;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 350px;
+            border-radius: 20px;
+            width: 340px;
             text-align: center;
-            animation: fadeIn 0.6s ease-in-out;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease;
         }
 
-        .login-card h2 {
+        .logo {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .subtitle {
+            color: gray;
+            margin-bottom: 25px;
+        }
+
+        /* INPUTS */
+        .input-group {
+            position: relative;
             margin-bottom: 20px;
-            font-weight: bold;
         }
 
-        .form-control {
-            border-radius: 10px;
-            padding: 12px;
+        .input-group i {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: gray;
         }
 
+        .toggle-password {
+            position: absolute;
+            right: 20px; /* 👈 ajústalo entre 15–20 */
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: gray;
+        }
+        .login-card {
+            width: 340px;
+            max-width: 90%;
+            overflow: hidden; /* 🔥 evita que se salga */
+        }
+
+        /* BOTÓN */
         .btn-login {
-            background: #0d6efd;
-            color: white;
-            border-radius: 10px;
-            padding: 10px;
             width: 100%;
+            padding: 12px;
             border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
             transition: 0.3s;
         }
 
         .btn-login:hover {
-            background: #0b5ed7;
+            transform: scale(1.05);
         }
 
+        /* ERROR */
         .error {
             color: red;
             margin-top: 10px;
+            animation: shake 0.3s;
         }
 
+        /* ANIMACIONES */
         @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        @@keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
     </style>
 </head>
 
 <body>
 
+<div class="login-container">
     <div class="login-card">
-        <h2>🏪 Mi Tiendita</h2>
-        <p>Inicia sesión</p>
+
+        <div class="logo">🏪</div>
+        <h2>Mi Tiendita</h2>
+        <p class="subtitle">Acceso seguro</p>
 
         <form method="post">
-            <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Usuario" asp-for="Usuario" />
+
+            <div class="input-group">
+                <i class="fa fa-user"></i>
+                <input type="text" name="Usuario" placeholder="Usuario" required />
             </div>
 
-            <div class="mb-3">
-                <input type="password" class="form-control" placeholder="Contraseña" asp-for="Password" />
+            <div class="input-group">
+                <i class="fa fa-lock"></i>
+                <input type="password" id="password" name="Password" placeholder="Contraseña" required />
+                <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
             </div>
 
             <button type="submit" class="btn-login">Ingresar</button>
@@ -95,8 +158,18 @@
             {
                 <div class="error">@Model.Error</div>
             }
+
         </form>
+
     </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById("password");
+        input.type = input.type === "password" ? "text" : "password";
+    }
+</script>
 
 </body>
 </html>

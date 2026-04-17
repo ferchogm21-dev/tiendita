@@ -41,5 +41,10 @@ namespace TienditaApp.Pages
             Error = "Usuario o contraseña incorrectos";
             return Page();
         }
+        public IActionResult OnPostLogout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToPage("/Login");
+        }
     }
 }

@@ -11,9 +11,9 @@
 </head>
 <body>
 
-    @{  
-        var usuario = Context.Session.GetString("Usuario");
-        var esLogin = Context.Request.Path.Value.ToLower().Contains("login");
+    @{
+    var usuario = Context.Session.GetString("Usuario") ?? "Invitado";
+    var esLogin = Context.Request.Path.StartsWithSegments("/Login");
     }
     @* 🔥 HEADER SOLO SI NO ES LOGIN *@
     @if (!esLogin)
@@ -53,18 +53,18 @@
                         margin-top:10px;
                         min-width:150px;
                     ">
-                        <form method="post" asp-page="/Logout">
-                            <button type="submit" style="
-                                width:100%;
-                                padding:10px;
-                                border:none;
-                                background:none;
-                                text-align:left;
-                                cursor:pointer;
-                            ">
-                                🔒 Cerrar sesión
-                            </button>
-                        </form>
+                        <form method="post" asp-page="/Login" asp-page-handler="Logout">
+                        <button type="submit" style="
+                            width:100%;
+                            padding:10px;
+                            border:none;
+                            background:none;
+                            text-align:left;
+                            cursor:pointer;
+                        ">
+                            🔒 Cerrar sesión
+                        </button>
+                    </form>
                     </div>
                 </div>
 
