@@ -88,13 +88,26 @@ namespace TienditaApp.Pages
         {
             using var conn = _context.CreateConnection();
 
-            conn.Execute(@"
-            UPDATE Ventas
-            SET Pagado = Total
-            WHERE ClienteId = @ClienteId AND EsFiado = 1
-        ", new { ClienteId = clienteId });
+            var deuda = conn.ExecuteScalar<decimal>(@"
+                SELECT SUM(Total - Pagado)
+                FROM Ventas
+                WHERE ClienteId = @ClienteId AND EsFiado = 1
+            ", new { ClienteId = clienteId });
 
-            return RedirectToPage(new { clienteId });
+            // 🔥 si aún debe, NO dejar liquidar
+            if (deuda > 0)
+            {
+                TempData["Error"] = "El cliente aún tiene saldo pendiente.";
+                return RedirectToPage(new { clienteId });
+            }
+
+            conn.Execute(@"
+                UPDATE Ventas
+                SET Pagado = Total
+                WHERE ClienteId = @ClienteId AND EsFiado = 1
+            ", new { ClienteId = clienteId });
+
+            return RedirectToPage();
         }
 
         // 🔹 Cargar deudas
