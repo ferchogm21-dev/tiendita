@@ -79,6 +79,13 @@ using (var scope = app.Services.CreateScope())
             Usuario TEXT NOT NULL UNIQUE,
             Password TEXT NOT NULL
         );
+        
+            INSERT INTO Usuarios (Nombre, Usuario, Password)
+            SELECT 'Fercho', 'Fercho', '1234'
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Usuarios WHERE Usuario = 'Fercho'
+            );
+        
 
         CREATE TABLE IF NOT EXISTS Clientes (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
