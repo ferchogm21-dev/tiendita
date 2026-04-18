@@ -1,30 +1,53 @@
 using TienditaApp.Data;
 using TienditaApp.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
+using Dapper;
+
 var builder = WebApplication.CreateBuilder(args);
 
+// =========================
+// DATABASE (SQLite + Dapper)
+// =========================
+builder.Services.AddSingleton<DapperContext>();
 
-builder.Services.AddScoped<DapperContext>();
 builder.Services.AddScoped<ProductoRepository>();
-builder.Services.AddScoped<ClienteRepository>();
 builder.Services.AddScoped<VentaRepository>();
+builder.Services.AddScoped<ClienteRepository>();
 
-// Add services to the container.
+// =========================
+// RAZOR PAGES
+// =========================
 builder.Services.AddRazorPages();
-builder.Services.AddSession();
+
+// =========================
+// SESSION
+// =========================
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// =========================
+// ERROR HANDLING
+// =========================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
+// =========================
+// MIDDLEWARE
+// =========================
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -33,7 +56,71 @@ app.UseSession();
 
 app.UseAuthorization();
 
+// =========================
+// RAZOR PAGES MAP
+// =========================
 app.MapRazorPages();
 
+// =========================
+// INIT DATABASE (CLAVE PARA RENDER)
+// =========================
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DapperContext>();
 
+    using var connection = context.CreateConnection();
+    connection.Open();
+
+    connection.Execute(@"
+        CREATE TABLE IF NOT EXISTS Usuarios (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nombre TEXT NOT NULL,
+            Usuario TEXT NOT NULL UNIQUE,
+            Password TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS Clientes (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nombre TEXT NOT NULL,
+            Telefono TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS Productos (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nombre TEXT NOT NULL,
+            Precio REAL NOT NULL,
+            Stock INTEGER NOT NULL DEFAULT 0
+        );
+
+       
+        CREATE TABLE IF NOT EXISTS Ventas (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ClienteId INTEGER,
+            Fecha TEXT NOT NULL,
+            Total REAL NOT NULL DEFAULT 0,
+            EsFiado INTEGER NOT NULL DEFAULT 0,
+            Pagado REAL NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS VentaDetalle (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            VentaId INTEGER NOT NULL,
+            ProductoId INTEGER NOT NULL,
+            Cantidad INTEGER NOT NULL,
+            Precio REAL NOT NULL,
+            Subtotal REAL NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS Pagos (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ClienteId INTEGER NOT NULL,
+            Fecha TEXT NOT NULL,
+            Monto REAL NOT NULL
+        );
+    ");
+}
+
+// =========================
+// RUN APP
+// =========================
 app.Run();
