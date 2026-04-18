@@ -95,12 +95,14 @@ using (var scope = app.Services.CreateScope())
 
        
         CREATE TABLE IF NOT EXISTS Ventas (
-            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ClienteId INTEGER,
-            Fecha TEXT NOT NULL,
-            Total REAL NOT NULL DEFAULT 0,
-            EsFiado INTEGER NOT NULL DEFAULT 0,
-            Pagado REAL NOT NULL DEFAULT 0
+        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ProductoId INTEGER,
+        ClienteId INTEGER,
+        Cantidad INTEGER,
+        Total REAL,
+        EsFiado INTEGER,
+        Pagado REAL,
+        Fecha TEXT
         );
 
         CREATE TABLE IF NOT EXISTS VentaDetalle (
