@@ -52,17 +52,34 @@ namespace TienditaApp.Pages
         {
             using var conn = _context.CreateConnection();
 
-            // Validación básica
             if (abono <= 0)
                 return RedirectToPage(new { clienteId });
 
-            conn.Execute(@"
-                UPDATE Ventas
-                SET Pagado = Pagado + @Abono
+            var ventas = conn.Query<Venta>(@"
+                SELECT * FROM Ventas 
                 WHERE ClienteId = @ClienteId AND EsFiado = 1
-            ", new { Abono = abono, ClienteId = clienteId });
+                ORDER BY Id
+            ", new { ClienteId = clienteId }).ToList();
 
-            // 🔥 CLAVE: redirigir para recargar datos
+            foreach (var v in ventas)
+            {
+                var pendiente = v.Total - v.Pagado;
+
+                if (pendiente <= 0) continue;
+
+                var abonoAplicado = Math.Min(abono, pendiente);
+
+                conn.Execute(@"
+                    UPDATE Ventas
+                    SET Pagado = Pagado + @Abono
+                    WHERE Id = @Id
+                ", new { Abono = abonoAplicado, Id = v.Id });
+
+                abono -= abonoAplicado;
+
+                if (abono <= 0) break;
+            }
+
             return RedirectToPage(new { clienteId });
         }
 
