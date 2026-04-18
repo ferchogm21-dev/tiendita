@@ -25,29 +25,27 @@ namespace TienditaApp.Pages
 
         // 🔹 GET
         public void OnGet(int? clienteId)
-        {
-            CargarDeudas();
-
-            if (clienteId.HasValue)
             {
-                using var conn = _context.CreateConnection();
+                CargarDeudas();
 
-                ClienteIdActual = clienteId;
+                if (clienteId.HasValue)
+                {
+                    using var conn = _context.CreateConnection();
 
-                DeudasCliente = conn.Query<ClienteDeuda>(@"
-                SELECT 
-                    v.ClienteId,
-                    c.Nombre AS ClienteNombre,
-                    SUM(v.Total) AS TotalDeuda,
-                    SUM(v.Pagado) AS TotalPagado
-                FROM Ventas v
-                LEFT JOIN Clientes c ON c.Id = v.ClienteId
-                WHERE v.EsFiado = 1
-                GROUP BY v.ClienteId, c.Nombre
-                HAVING SUM(v.Total - v.Pagado) > 0
-            ").ToList();
+                    ClienteIdActual = clienteId;
+
+                    ClienteNombreActual = conn.QueryFirstOrDefault<string>(
+                        "SELECT Nombre FROM Clientes WHERE Id = @Id",
+                        new { Id = clienteId }) ?? "";
+
+                    // 🔥 ESTA LÍNEA FALTABA
+                    VentasCliente = conn.Query<Venta>(@"
+                        SELECT * 
+                        FROM Ventas 
+                        WHERE ClienteId = @Id AND EsFiado = 1
+                    ", new { Id = clienteId }).ToList();
+                }
             }
-        }
 
         // 🔥 ABONAR
         public IActionResult OnPostAbonar(int clienteId, decimal abono)
