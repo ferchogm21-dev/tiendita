@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TienditaApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e84e2d5ee44242660cd4539f40dd8d1c5ad3058")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1dd7174e77e9d26778263fbf80c5efbcafb71452")]
 [assembly: System.Reflection.AssemblyProductAttribute("TienditaApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TienditaApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
