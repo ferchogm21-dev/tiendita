@@ -30,6 +30,11 @@ public class VentasModel : PageModel
 
     public IActionResult OnGet()
     {
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+
         ListaVentas = _ventaRepo.ObtenerVentas();
         Productos = _productoRepo.ObtenerTodos().ToList();
         Clientes = _clienteRepo.ObtenerClientes();
@@ -38,8 +43,28 @@ public class VentasModel : PageModel
     }
 
     public IActionResult OnPost()
-    {
+    {   
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+        // 🔥 VALIDACIONES
+        if (Venta.ProductoId == 0)
+        {
+            ModelState.AddModelError("", "Selecciona un producto");
+            return Page();
+        }
+
+        if (Venta.ClienteId == 0)
+        {
+            ModelState.AddModelError("", "Selecciona un cliente");
+            return Page();
+        }
+
+        // ✅ Si todo está bien, registra la venta
         _ventaRepo.RegistrarVenta(Venta);
+
         return RedirectToPage();
     }
+    
 }

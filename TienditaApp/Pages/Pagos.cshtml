@@ -3,6 +3,7 @@
 
 <h1>💰 Pagos / Deudores</h1>
 
+<h3>💰 Total que deben todos: $@Model.TotalGeneralDeuda</h3>
 <hr />
 
 <h2>Clientes con deuda</h2>
@@ -43,6 +44,7 @@
 
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background:#198754; color:white;">
+            <th>Producto</th>
             <th>Total</th>
             <th>Pagado</th>
             <th>Debe</th>
@@ -51,6 +53,7 @@
         @foreach (var v in Model.VentasCliente)
         {
             <tr style="text-align:center;">
+                <td>@v.ProductoNombre</td>
                 <td>$@v.Total</td>
                 <td>$@v.Pagado</td>
                 <td style="color:red;">

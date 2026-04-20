@@ -20,11 +20,7 @@ namespace TienditaApp.Repositories
             // 🔥 Buscar producto por ID
             var producto = connection.QueryFirstOrDefault<Producto>(
             "SELECT * FROM Productos WHERE Id = @Id",
-            new { Id = venta.ProductoId });
-
-            if (producto == null)
-                throw new Exception("Producto no encontrado");
-
+            new { Id = venta.ProductoId }) ?? throw new Exception("Producto no encontrado");
             if (producto.Stock < venta.Cantidad)
                 throw new Exception("Stock insuficiente");
 

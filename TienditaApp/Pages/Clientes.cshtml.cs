@@ -20,14 +20,23 @@ public class ClientesModel : PageModel
     public List<Cliente> ListaClientes { get; set; } = new();
 
     // 🔹 GET
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
         ListaClientes = _clienteRepo.ObtenerClientes();
+        return Page();
     }
 
     // 🔹 INSERT / UPDATE
     public IActionResult OnPost()
-    {
+    {   
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
         if (!ModelState.IsValid)
         {
             ListaClientes = _clienteRepo.ObtenerClientes();

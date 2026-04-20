@@ -129,7 +129,7 @@ td {
         }
     </select>
 
-    <select name="Venta.ClienteId">
+    <select id="clienteSelect" name="Venta.ClienteId">
         <option value="">Selecciona cliente</option>
         @foreach (var c in Model.Clientes)
         {
@@ -246,9 +246,16 @@ function actualizarInfo() {
 
 function validarVenta() {
     const selected = productoSelect.options[productoSelect.selectedIndex];
+    const clienteSelect = document.getElementById("clienteSelect");
+    const selectedCliente = clienteSelect.options[clienteSelect.selectedIndex];
 
     if (!selected || !selected.value) {
         alert("❌ Selecciona un producto");
+        return false;
+    }
+
+    if (!selectedCliente || !selectedCliente.value) {
+        alert("❌ Selecciona un cliente");
         return false;
     }
 

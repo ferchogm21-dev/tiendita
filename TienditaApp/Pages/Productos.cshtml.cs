@@ -20,14 +20,29 @@ public class ProductosModel : PageModel
     public List<Producto> ListaProductos { get; set; } = new();
 
     // 🔹 GET
-    public void OnGet()
-    {
+    public IActionResult OnGet()
+    {   
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+
         ListaProductos = _productoRepo.ObtenerTodos();
+        return Page();
     }
 
     // 🔹 INSERT / UPDATE
     public IActionResult OnPost()
-    {
+    {  
+         if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+        if (Producto.Stock <= 0)
+        {
+            ModelState.AddModelError("", "El stock debe ser mayor a 0");
+            return Page();
+        }
         if (!ModelState.IsValid)
         {
             ListaProductos = _productoRepo.ObtenerTodos();
@@ -48,7 +63,7 @@ public class ProductosModel : PageModel
 
     // 🔹 EDITAR
     public IActionResult OnGetEditar(int id)
-    {
+    {   
         Producto = _productoRepo.ObtenerPorId(id) ?? new() { Nombre = "" };
         ListaProductos = _productoRepo.ObtenerTodos();
         return Page();

@@ -194,3 +194,9 @@
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/TienditaApp.pdb
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/TienditaApp.genruntimeconfig.cache
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/ref/TienditaApp.dll
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/web.config
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/appsettings.Development.json
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/appsettings.json
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/TienditaApp.deps.json
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/TienditaApp.runtimeconfig.json
+/workspaces/tiendita/TienditaApp/bin/Debug/net10.0/publish/TienditaApp.staticwebassets.endpoints.json

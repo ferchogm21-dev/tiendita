@@ -25,4 +25,6 @@ public class Venta
 
     // Propiedad calculada (Dapper la ignora automáticamente)
     public decimal Saldo => Total - Pagado;
+
+    public string? ProductoNombre { get; set; }
 }

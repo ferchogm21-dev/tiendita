@@ -23,64 +23,45 @@ namespace TienditaApp.Pages
         public int? ClienteIdActual { get; set; }
         public string ClienteNombreActual { get; set; } = "";
 
+        public decimal TotalDeudaCliente { get; set; }
+        public decimal TotalGeneralDeuda { get; set; }
+
         // 🔹 GET
-        public void OnGet(int? clienteId)
-            {
-                CargarDeudas();
-
-                if (clienteId.HasValue)
-                {
-                    using var conn = _context.CreateConnection();
-
-                    ClienteIdActual = clienteId;
-
-                    ClienteNombreActual = conn.QueryFirstOrDefault<string>(
-                        "SELECT Nombre FROM Clientes WHERE Id = @Id",
-                        new { Id = clienteId }) ?? "";
-
-                    // 🔥 ESTA LÍNEA FALTABA
-                    VentasCliente = conn.Query<Venta>(@"
-                        SELECT * 
-                        FROM Ventas 
-                        WHERE ClienteId = @Id AND EsFiado = 1
-                    ", new { Id = clienteId }).ToList();
-                }
-            }
-
-        // 🔥 ABONAR
-        public IActionResult OnPostAbonar(int clienteId, decimal abono)
+        public IActionResult OnGet(int? clienteId)
         {
-            using var conn = _context.CreateConnection();
-
-            if (abono <= 0)
-                return RedirectToPage(new { clienteId });
-
-            var ventas = conn.Query<Venta>(@"
-                SELECT * FROM Ventas 
-                WHERE ClienteId = @ClienteId AND EsFiado = 1
-                ORDER BY Id
-            ", new { ClienteId = clienteId }).ToList();
-
-            foreach (var v in ventas)
+            if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+            CargarDeudas(); // 🔥 SIEMPRE se ejecuta
+            
+            if (clienteId.HasValue)
             {
-                var pendiente = v.Total - v.Pagado;
+                using var conn = _context.CreateConnection();
 
-                if (pendiente <= 0) continue;
+                ClienteIdActual = clienteId;
 
-                var abonoAplicado = Math.Min(abono, pendiente);
+                ClienteNombreActual = conn.QueryFirstOrDefault<string>(
+                    "SELECT Nombre FROM Clientes WHERE Id = @Id",
+                    new { Id = clienteId }) ?? "";
 
-                conn.Execute(@"
-                    UPDATE Ventas
-                    SET Pagado = Pagado + @Abono
-                    WHERE Id = @Id
-                ", new { Abono = abonoAplicado, Id = v.Id });
+                VentasCliente = conn.Query<Venta>(@"
+                    SELECT 
+                        v.*,
+                        p.Nombre AS ProductoNombre
+                    FROM Ventas v
+                    LEFT JOIN Productos p ON p.Id = v.ProductoId
+                    WHERE v.ClienteId = @Id AND v.EsFiado = 1
+                ", new { Id = clienteId }).ToList();
 
-                abono -= abonoAplicado;
-
-                if (abono <= 0) break;
+                TotalDeudaCliente = conn.ExecuteScalar<decimal>(@"
+                    SELECT IFNULL(SUM(v.Total - IFNULL(v.Pagado, 0)), 0)
+                    FROM Ventas v
+                    WHERE v.ClienteId = @Id AND v.EsFiado = 1
+                ", new { Id = clienteId });
             }
 
-            return RedirectToPage(new { clienteId });
+            return Page();
         }
 
         // 🔥 LIQUIDAR TODO
@@ -126,6 +107,13 @@ namespace TienditaApp.Pages
                 WHERE v.EsFiado = 1
                 GROUP BY v.ClienteId, c.Nombre
             ").ToList();
+
+            // 🔥 AQUÍ VA EL TOTAL GLOBAL (SIEMPRE SE CALCULA)
+            TotalGeneralDeuda = conn.ExecuteScalar<decimal>(@"
+                SELECT IFNULL(SUM(Total - IFNULL(Pagado,0)), 0)
+                FROM Ventas
+                WHERE EsFiado = 1
+            ");
         }
     }
 }

@@ -30,7 +30,7 @@ namespace TienditaApp.Pages
             command.Parameters.AddWithValue("$user", Usuario);
             command.Parameters.AddWithValue("$pass", Password);
 
-            var result = (long)command.ExecuteScalar();
+            long result = (long)(command.ExecuteScalar() ?? 0L);
 
             if (result > 0)
             {
