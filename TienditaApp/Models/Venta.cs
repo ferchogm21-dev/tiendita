@@ -19,12 +19,12 @@ public class Venta
 
     public bool EsFiado { get; set; }
 
-    public decimal Pagado { get; set; }
+    public decimal? Pagado { get; set; }
 
     public DateTime? FechaPago { get; set; }
 
     // Propiedad calculada (Dapper la ignora automáticamente)
-    public decimal Saldo => Total - Pagado;
+    public decimal Saldo => Total - (Pagado ?? 0);
 
     public string? ProductoNombre { get; set; }
 }

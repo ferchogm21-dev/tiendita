@@ -115,5 +115,45 @@ namespace TienditaApp.Pages
                 WHERE EsFiado = 1
             ");
         }
+        public IActionResult OnPostAbonar(int clienteId, decimal abono)
+        {
+            if (HttpContext.Session.GetString("Usuario") == null)
+            {
+                return RedirectToPage("/Login");
+            }
+
+            using var conn = _context.CreateConnection();
+
+            if (abono <= 0)
+                return RedirectToPage(new { clienteId });
+
+            var ventas = conn.Query<Venta>(@"
+            SELECT *, IFNULL(Pagado, 0) AS Pagado
+            FROM Ventas 
+            WHERE ClienteId = @ClienteId AND EsFiado = 1
+        ", new { ClienteId = clienteId }).ToList();
+
+            foreach (var v in ventas)
+            {
+                var pagado = v.Pagado ?? 0;
+                var pendiente = v.Total - pagado;
+
+                if (pendiente <= 0) continue;
+
+                var abonoAplicado = Math.Min(abono, pendiente);
+
+                conn.Execute(@"
+                    UPDATE Ventas
+                    SET Pagado = IFNULL(Pagado, 0) + @Abono
+                    WHERE Id = @Id
+                ", new { Abono = abonoAplicado, Id = v.Id });
+
+                abono -= abonoAplicado;
+
+                if (abono <= 0) break;
+            }
+
+            return RedirectToPage(new { clienteId });
+        }
     }
 }

@@ -57,7 +57,7 @@
                 <td>$@v.Total</td>
                 <td>$@v.Pagado</td>
                 <td style="color:red;">
-                $@Math.Max(0, v.Total - v.Pagado)
+                $@(v.Total > v.Pagado ? v.Total - v.Pagado : 0m)
             </td>
             </tr>
         }
