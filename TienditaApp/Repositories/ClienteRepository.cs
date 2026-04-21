@@ -53,4 +53,28 @@ public class ClienteRepository
         var sql = "DELETE FROM Clientes WHERE Id = @Id";
         connection.Execute(sql, new { Id = id });
     }
+
+    public IEnumerable<Cliente> ObtenerPaginados(int pageNumber, int pageSize)
+    {
+        using var connection = _context.CreateConnection();
+
+        var offset = (pageNumber - 1) * pageSize;
+
+        var sql = @"SELECT * FROM Clientes
+                    ORDER BY Id DESC
+                    LIMIT @PageSize OFFSET @Offset";
+
+        return connection.Query<Cliente>(sql, new
+        {
+            PageSize = pageSize,
+            Offset = offset
+        });
+    }
+
+    public int ObtenerTotal()
+    {
+        using var connection = _context.CreateConnection();
+        return connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Clientes");
+    }
+    
 }

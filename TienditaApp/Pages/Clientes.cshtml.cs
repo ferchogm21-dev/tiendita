@@ -18,15 +18,27 @@ public class ClientesModel : PageModel
     public Cliente Cliente { get; set; } = new();
 
     public List<Cliente> ListaClientes { get; set; } = new();
+     public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+
 
     // 🔹 GET
-    public IActionResult OnGet()
+    public IActionResult OnGet(int pageNumber = 1)
     {
         if (HttpContext.Session.GetString("Usuario") == null)
         {
             return RedirectToPage("/Login");
         }
         ListaClientes = _clienteRepo.ObtenerClientes();
+        int pageSize = 10;
+
+        PageNumber = pageNumber;
+
+        ListaClientes = _clienteRepo.ObtenerPaginados(PageNumber, pageSize).ToList();
+
+        var total = _clienteRepo.ObtenerTotal();
+        TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+
         return Page();
     }
 

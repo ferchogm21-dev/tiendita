@@ -15,5 +15,7 @@ namespace TienditaApp.Models
         public bool EsFiado { get; set; }
 
         public DateTime Fecha { get; set; }
+        public decimal Pagado { get; set; }
+        public decimal Saldo { get; set; }
     }
 }

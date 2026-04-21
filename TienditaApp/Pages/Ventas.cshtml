@@ -205,6 +205,34 @@ td {
         </tr>
     }
 </table>
+<nav>
+    <ul class="pagination justify-content-center">
+
+        <!-- Anterior -->
+        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+            <a class="page-link" href="?pageNumber=@(Model.PageNumber - 1)">«</a>
+        </li>
+
+        <!-- Números inteligentes -->
+        @{
+            int start = Math.Max(1, Model.PageNumber - 2);
+            int end = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+        }
+
+        @for (int i = start; i <= end; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" href="?pageNumber=@i">@i</a>
+            </li>
+        }
+
+        <!-- Siguiente -->
+        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" href="?pageNumber=@(Model.PageNumber + 1)">»</a>
+        </li>
+
+    </ul>
+</nav>
 
 <script>
 const productoSelect = document.getElementById("productoSelect");

@@ -1,5 +1,6 @@
 using Dapper;
 using TienditaApp.Data;
+using TienditaApp.Migrations;
 using TienditaApp.Models;
 
 namespace TienditaApp.Repositories
@@ -91,5 +92,61 @@ namespace TienditaApp.Repositories
                 GROUP BY v.ClienteId, c.Nombre
             ").ToList();
         }
+        public IEnumerable<Venta> ObtenerPaginados(int pageNumber, int pageSize)
+        {
+            using var connection = _context.CreateConnection();
+
+            var offset = (pageNumber - 1) * pageSize;
+
+            var sql = @"
+            SELECT v.*, 
+                c.Nombre AS ClienteNombre,
+                (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+            FROM Ventas v
+            LEFT JOIN Clientes c ON c.Id = v.ClienteId
+            ORDER BY v.Id DESC
+            LIMIT @PageSize OFFSET @Offset";
+
+            return connection.Query<Venta>(sql, new
+            {
+                PageSize = pageSize,
+                Offset = offset
+            });
+        }
+
+        public int ObtenerTotal()
+        {
+            using var connection = _context.CreateConnection();
+            return connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Ventas");
+        }
+        public List<VentaDTO> ObtenerVentasPaginadas(int pageNumber, int pageSize)
+{
+    using var connection = _context.CreateConnection();
+
+    var offset = (pageNumber - 1) * pageSize;
+
+    var sql = @"
+    SELECT 
+        v.Id,
+        p.Nombre AS Producto,
+        c.Nombre AS Cliente,
+        v.Cantidad,
+        v.Total,
+        v.EsFiado,
+        v.Fecha,
+        IFNULL(v.Pagado,0) AS Pagado,
+        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+    FROM Ventas v
+    LEFT JOIN Productos p ON p.Id = v.ProductoId
+    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+    ORDER BY v.Id DESC
+    LIMIT @PageSize OFFSET @Offset";
+
+    return connection.Query<VentaDTO>(sql, new
+    {
+        PageSize = pageSize,
+        Offset = offset
+    }).ToList();
+}
     }
 }

@@ -18,9 +18,12 @@ public class ProductosModel : PageModel
     public Producto Producto { get; set; } = new() { Nombre = "" };
 
     public List<Producto> ListaProductos { get; set; } = new();
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+
 
     // 🔹 GET
-    public IActionResult OnGet()
+    public IActionResult OnGet(int pageNumber = 1)
     {   
         if (HttpContext.Session.GetString("Usuario") == null)
         {
@@ -28,6 +31,15 @@ public class ProductosModel : PageModel
         }
 
         ListaProductos = _productoRepo.ObtenerTodos();
+            int pageSize = 10;
+
+                    PageNumber = pageNumber;
+
+                    ListaProductos = _productoRepo.ObtenerPaginados(PageNumber, pageSize).ToList();
+
+                    var total = _productoRepo.ObtenerTotal();
+                    TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+
         return Page();
     }
 

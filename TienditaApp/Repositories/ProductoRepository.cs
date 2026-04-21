@@ -55,4 +55,26 @@ public class ProductoRepository
         var sql = "DELETE FROM Productos WHERE Id = @Id";
         connection.Execute(sql, new { Id = id });
     }
+    public IEnumerable<Producto> ObtenerPaginados(int pageNumber, int pageSize)
+    {
+        using var connection = _context.CreateConnection();
+
+        var offset = (pageNumber - 1) * pageSize;
+
+        var sql = @"SELECT * FROM Productos
+                    ORDER BY Id DESC
+                    LIMIT @PageSize OFFSET @Offset";
+
+        return connection.Query<Producto>(sql, new
+        {
+            PageSize = pageSize,
+            Offset = offset
+        });
+    }
+
+    public int ObtenerTotal()
+    {
+        using var connection = _context.CreateConnection();
+        return connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Productos");
+    }
 }

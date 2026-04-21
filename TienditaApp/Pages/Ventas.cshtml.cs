@@ -27,20 +27,31 @@ public class VentasModel : PageModel
     public List<Producto> Productos { get; set; } = new();
     public List<Cliente> Clientes { get; set; } = new();
     public List<VentaDTO> ListaVentas { get; set; } = new();
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
 
-    public IActionResult OnGet()
-    {
-        if (HttpContext.Session.GetString("Usuario") == null)
+    public IActionResult OnGet(int pageNumber = 1)
         {
-            return RedirectToPage("/Login");
+            if (HttpContext.Session.GetString("Usuario") == null)
+            {
+                return RedirectToPage("/Login");
+            }
+
+            int pageSize = 10;
+
+            PageNumber = pageNumber;
+
+            // 🔥 PAGINACIÓN REAL
+            ListaVentas = _ventaRepo.ObtenerVentasPaginadas(PageNumber, pageSize);
+
+            var total = _ventaRepo.ObtenerTotal();
+            TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+
+            Productos = _productoRepo.ObtenerTodos().ToList();
+            Clientes = _clienteRepo.ObtenerClientes();
+
+            return Page();
         }
-
-        ListaVentas = _ventaRepo.ObtenerVentas();
-        Productos = _productoRepo.ObtenerTodos().ToList();
-        Clientes = _clienteRepo.ObtenerClientes();
-
-        return Page();
-    }
 
     public IActionResult OnPost()
     {   
