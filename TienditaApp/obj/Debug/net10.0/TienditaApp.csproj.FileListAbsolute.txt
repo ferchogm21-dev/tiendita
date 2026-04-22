@@ -200,3 +200,4 @@
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/TienditaApp.pdb
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/TienditaApp.genruntimeconfig.cache
 /workspaces/tiendita/TienditaApp/obj/Debug/net10.0/ref/TienditaApp.dll
+/workspaces/tiendita/TienditaApp/obj/Debug/net10.0/compressed/5qzxai4r1h-{0}-9r3wonn10o-9r3wonn10o.gz

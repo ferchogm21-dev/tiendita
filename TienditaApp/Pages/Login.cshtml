@@ -1,175 +1,51 @@
 @page
-@model TienditaApp.Pages.LoginModel
+@model LoginModel
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Tiendita</title>
-
-    <!-- ICONOS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-        }
-        * {
-                box-sizing: border-box;
-            }
-        .input-group input {
-            width: 100%;
-            padding: 12px 65px 12px 38px; /* espacio para iconos */
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
-
-        .login-container {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            width: 340px;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            animation: fadeIn 0.6s ease;
-        }
-
-        .logo {
-            font-size: 45px;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            margin: 0;
-        }
-
-        .subtitle {
-            color: gray;
-            margin-bottom: 25px;
-        }
-
-        /* INPUTS */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-group i {
-            position: absolute;
-            top: 50%;
-            left: 12px;
-            transform: translateY(-50%);
-            color: gray;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 20px; /* 👈 ajústalo entre 15–20 */
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: gray;
-        }
-        .login-card {
-            width: 340px;
-            max-width: 90%;
-            overflow: hidden; /* 🔥 evita que se salga */
-        }
-
-        /* BOTÓN */
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover {
-            transform: scale(1.05);
-        }
-
-        /* ERROR */
-        .error {
-            color: red;
-            margin-top: 10px;
-            animation: shake 0.3s;
-        }
-
-        /* ANIMACIONES */
-        @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        @@keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-    </style>
+    <title>Login - Ferxxito</title>
+    <link rel="stylesheet" href="~/css/login.css" />
 </head>
 
-<body>
+<body class="login-body">
 
-<div class="login-container">
-    <div class="login-card">
+    <div class="login-container">
 
-        <div class="logo">🏪</div>
-        <h2>Mi Tiendita</h2>
-        <p class="subtitle">Acceso seguro</p>
+        <div class="login-card">
 
-        <form method="post">
+            <!-- LOGO -->
+            <img src="~/images/logo-ferxxito.png" class="logo" />
 
-            <div class="input-group">
-                <i class="fa fa-user"></i>
-                <input type="text" name="Usuario" placeholder="Usuario" required />
-            </div>
+            <h2>Iniciar sesión</h2>
+            <p class="subtitle">Bienvenido de vuelta a Ferxxito</p>
 
-            <div class="input-group">
-                <i class="fa fa-lock"></i>
-                <input type="password" id="password" name="Password" placeholder="Contraseña" required />
-                <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
-            </div>
+            <form method="post">
 
-            <button type="submit" class="btn-login">Ingresar</button>
+                <input type="text" name="Usuario" placeholder="Ingresa tu usuario" class="input" />
 
-            @if (!string.IsNullOrEmpty(Model.Error))
-            {
-                <div class="error">@Model.Error</div>
-            }
+                <input type="password" name="Password" placeholder="Ingresa tu contraseña" class="input" />
 
-        </form>
+                <div class="options">
+                    <label><input type="checkbox" /> Recordarme</label>
+                    
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+            <p class="footer">Ferxxito — Tu tiendita de confianza</p>
+
+        </div>
 
     </div>
-</div>
-
-<script>
-    function togglePassword() {
-        const input = document.getElementById("password");
-        input.type = input.type === "password" ? "text" : "password";
-    }
-</script>
 
 </body>
 </html>
