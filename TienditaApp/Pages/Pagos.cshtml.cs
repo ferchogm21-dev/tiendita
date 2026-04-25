@@ -6,6 +6,7 @@ using Dapper;
 using TienditaApp.Data;
 using TienditaApp.Models;
 
+
 namespace TienditaApp.Pages
 {
     public class PagosModel : PageModel
@@ -115,43 +116,75 @@ namespace TienditaApp.Pages
                 WHERE EsFiado = 1
             ");
         }
-        public IActionResult OnPostAbonar(int clienteId, decimal abono)
+        public IActionResult OnPostAbonarVenta(int ventaId, int clienteId, decimal abono)
         {
             if (HttpContext.Session.GetString("Usuario") == null)
-            {
                 return RedirectToPage("/Login");
+
+            if (abono <= 0)
+            {
+                TempData["Error"] = "El abono debe ser mayor a 0";
+                return RedirectToPage(new { clienteId });
             }
 
             using var conn = _context.CreateConnection();
 
-            if (abono <= 0)
+            var venta = conn.QueryFirstOrDefault<Venta>(@"
+                SELECT *, IFNULL(Pagado, 0) AS Pagado
+                FROM Ventas
+                WHERE Id = @Id
+            ", new { Id = ventaId });
+
+            if (venta == null)
                 return RedirectToPage(new { clienteId });
 
-            var ventas = conn.Query<Venta>(@"
-            SELECT *, IFNULL(Pagado, 0) AS Pagado
-            FROM Ventas 
-            WHERE ClienteId = @ClienteId AND EsFiado = 1
-        ", new { ClienteId = clienteId }).ToList();
+            var pagado = venta.Pagado ?? 0;
+            var pendiente = venta.Total - pagado;
 
-            foreach (var v in ventas)
-            {
-                var pagado = v.Pagado ?? 0;
-                var pendiente = v.Total - pagado;
+            if (pendiente <= 0)
+                return RedirectToPage(new { clienteId });
 
-                if (pendiente <= 0) continue;
+            var abonoAplicado = Math.Min(abono, pendiente);
 
-                var abonoAplicado = Math.Min(abono, pendiente);
+            conn.Execute(@"
+                UPDATE Ventas
+                SET Pagado = IFNULL(Pagado, 0) + @Abono
+                WHERE Id = @Id
+            ", new { Abono = abonoAplicado, Id = ventaId });
 
-                conn.Execute(@"
-                    UPDATE Ventas
-                    SET Pagado = IFNULL(Pagado, 0) + @Abono
-                    WHERE Id = @Id
-                ", new { Abono = abonoAplicado, Id = v.Id });
+            return RedirectToPage(new { clienteId });
+        }
 
-                abono -= abonoAplicado;
+        // ✔ LIQUIDAR PRODUCTO
+        public IActionResult OnPostLiquidarVenta(int ventaId, int clienteId)
+        {
+            if (HttpContext.Session.GetString("Usuario") == null)
+                return RedirectToPage("/Login");
 
-                if (abono <= 0) break;
-            }
+            using var conn = _context.CreateConnection();
+
+            conn.Execute(@"
+                UPDATE Ventas
+                SET Pagado = Total
+                WHERE Id = @Id
+            ", new { Id = ventaId });
+
+            return RedirectToPage(new { clienteId });
+        }
+
+        // ↩ DESHACER LIQUIDACIÓN
+        public IActionResult OnPostDeshacerLiquidacion(int ventaId, int clienteId)
+        {
+            if (HttpContext.Session.GetString("Usuario") == null)
+                return RedirectToPage("/Login");
+
+            using var conn = _context.CreateConnection();
+
+            conn.Execute(@"
+                UPDATE Ventas
+                SET Pagado = 0
+                WHERE Id = @Id
+            ", new { Id = ventaId });
 
             return RedirectToPage(new { clienteId });
         }

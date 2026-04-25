@@ -143,7 +143,6 @@ C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\publish\appse
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\publish\appsettings.json
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\publish\TienditaApp.deps.json
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\publish\TienditaApp.runtimeconfig.json
-C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\publish\TienditaApp.staticwebassets.endpoints.json
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\TienditaApp.staticwebassets.runtime.json
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\TienditaApp.exe
 C:\Users\Atencion a clientes\tiendita\TienditaApp\bin\Debug\net8.0\TienditaApp.deps.json
