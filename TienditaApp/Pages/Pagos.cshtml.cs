@@ -98,16 +98,17 @@ namespace TienditaApp.Pages
             using var conn = _context.CreateConnection();
 
             DeudasCliente = conn.Query<ClienteDeuda>(@"
-                SELECT 
-                    v.ClienteId,
-                    c.Nombre AS ClienteNombre,
-                    SUM(v.Total) AS TotalDeuda,
-                    SUM(v.Pagado) AS TotalPagado
-                FROM Ventas v
-                LEFT JOIN Clientes c ON c.Id = v.ClienteId
-                WHERE v.EsFiado = 1
-                GROUP BY v.ClienteId, c.Nombre
-            ").ToList();
+            SELECT 
+                v.ClienteId,
+                c.Nombre AS ClienteNombre,
+                c.Telefono,
+                SUM(v.Total) AS TotalDeuda,
+                SUM(v.Pagado) AS TotalPagado
+            FROM Ventas v
+            LEFT JOIN Clientes c ON c.Id = v.ClienteId
+            WHERE v.EsFiado = 1
+            GROUP BY v.ClienteId, c.Nombre, c.Telefono
+        ").ToList();
 
             // 🔥 AQUÍ VA EL TOTAL GLOBAL (SIEMPRE SE CALCULA)
             TotalGeneralDeuda = conn.ExecuteScalar<decimal>(@"
@@ -187,6 +188,43 @@ namespace TienditaApp.Pages
             ", new { Id = ventaId });
 
             return RedirectToPage(new { clienteId });
+        }
+        // 📲 GENERAR MENSAJE DETALLADO WHATSAPP
+        public string GenerarMensajeDetalle(int clienteId, string nombre)
+        {
+            using var conn = _context.CreateConnection();
+
+            var ventas = conn.Query<Venta>(@"
+                SELECT v.*, p.Nombre AS ProductoNombre
+                FROM Ventas v
+                LEFT JOIN Productos p ON p.Id = v.ProductoId
+                WHERE v.ClienteId = @Id AND v.EsFiado = 1
+            ", new { Id = clienteId }).ToList();
+
+            // 🏪 ENCABEZADO
+            var mensaje = " Ferxxito %0A";
+            mensaje += "--------------------%0A";
+            mensaje += $"Hola {nombre} %0A";
+            mensaje += "Te comparto tu detalle de deuda:%0A%0A";
+
+            decimal total = 0;
+
+            foreach (var v in ventas)
+            {
+                var pagado = v.Pagado ?? 0;
+                var pendiente = v.Total - pagado;
+
+                if (pendiente <= 0) continue;
+
+                mensaje += $" {v.ProductoNombre}: ${pendiente}%0A";
+                total += pendiente;
+            }
+
+            // 💰 TOTAL
+            mensaje += $"%0ATotal: ${total} %0A";
+            mensaje += "Gracias por tu preferencia ";
+
+            return mensaje;
         }
     }
 }

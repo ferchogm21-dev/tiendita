@@ -58,6 +58,14 @@
 
     @foreach (var d in Model.DeudasCliente)
     {
+        var telefono = !string.IsNullOrEmpty(d.Telefono)
+        ? "521" + d.Telefono
+        : "";
+
+        var mensaje = Model.GenerarMensajeDetalle(d.ClienteId, d.ClienteNombre);
+
+        var link = $"https://wa.me/{telefono}?text={mensaje}";
+                
         <tr style="text-align:center;">
         
             <td>@d.ClienteNombre</td>
@@ -67,13 +75,21 @@
             <td>
                 <!-- ✅ CORREGIDO -->
                 <a asp-page="Pagos"
-   asp-route-clienteId="@d.ClienteId"
-   class="btn btn-sm btn-info">
-    <i class="bi bi-eye"></i>👁️ Ver detalles
-</a>
+                asp-route-clienteId="@d.ClienteId"
+                class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i>👁️ Ver detalles
+                </a>
+                <a href="@link" target="_blank"
+                class="btn btn-sm btn-success">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>
             </td>
+            
+            
+        
         </tr>
     }
+    
 </table>
 
 <hr />

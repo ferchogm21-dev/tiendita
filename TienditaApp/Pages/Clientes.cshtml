@@ -85,11 +85,14 @@
             <td>
 
                 <!-- ✏️ EDITAR (usa GET con id) -->
-                <a asp-page="./Clientes"
+                <a asp-page="Clientes"
+                asp-page-handler="Editar"
                 asp-route-id="@item.Id"
                 style="background:#0d6efd;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;">
                 ✏️ Editar
                 </a>
+
+                
 
             <!-- 🗑 ELIMINAR -->
             <form method="post" style="display:inline;">

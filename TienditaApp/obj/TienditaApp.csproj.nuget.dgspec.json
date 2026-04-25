@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj": {}
+    "C:\\Users\\Fercho\\tiendita\\TienditaApp\\TienditaApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj": {
+    "C:\\Users\\Fercho\\tiendita\\TienditaApp\\TienditaApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj",
+        "projectUniqueName": "C:\\Users\\Fercho\\tiendita\\TienditaApp\\TienditaApp.csproj",
         "projectName": "TienditaApp",
-        "projectPath": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj",
-        "packagesPath": "C:\\Users\\Atencion a clientes\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\obj\\",
+        "projectPath": "C:\\Users\\Fercho\\tiendita\\TienditaApp\\TienditaApp.csproj",
+        "packagesPath": "C:\\Users\\Fercho\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Fercho\\tiendita\\TienditaApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Atencion a clientes\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Fercho\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -81,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.420/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.126/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
