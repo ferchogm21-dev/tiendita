@@ -202,10 +202,13 @@ namespace TienditaApp.Pages
             ", new { Id = clienteId }).ToList();
 
             // 🏪 ENCABEZADO
-            var mensaje = " Ferxxito %0A";
+            var mensaje = "---- Ferxxito ----%0A";
             mensaje += "--------------------%0A";
+            mensaje += "Cuenta de Deposito%0A";
+            mensaje += "Banco BBVA%0A";
+            mensaje += "N° de Tarjeta 4152 3138 8503 9920%0A%0A";
             mensaje += $"Hola {nombre} %0A";
-            mensaje += "Te comparto tu detalle de deuda:%0A%0A";
+            mensaje += "Te comparto el detalle de tus compras:%0A%0A";
 
             decimal total = 0;
 
