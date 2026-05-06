@@ -15,49 +15,63 @@
 
 <h2>Clientes con deuda</h2>
 <style>
+    body {
+        background: #f5f7fa;
+        font-family: Arial, sans-serif;
+    }
+
+    /* INPUTS */
     input {
-        padding: 8px;
-        margin: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    .table td, .table th {
-    white-space: nowrap;
-}
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
         padding: 10px;
-        border-bottom: 1px solid #ddd;
+        margin: 8px 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
     }
 
+    /* TABLA (MISMO ESTILO QUE LA OTRA) */
+    .table th {
+    background: #ffc107;
+    color: white;
+    
+}
+
+    /* CELDAS */
+    td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        white-space: nowrap;
+    }
+
+    /* HOVER FILAS */
     tr:hover {
-        background-color: #f5f5f5;
+        background-color: #f1f1f1;
     }
 
+    /* BOTONES */
     button {
-        padding: 5px 10px;
+        padding: 10px 18px;
         border: none;
-        border-radius: 5px;
+        border-radius: 8px;
+        background: #198754;
+        color: white;
         cursor: pointer;
+        transition: 0.3s;
     }
 
     button:hover {
-        opacity: 0.8;
+        opacity: 0.9;
     }
 </style>
 <table class="table">
-    <tr style="background:#0d6efd; color:white;">
-        <th>Cliente</th>
-        <th>Total</th>
-        <th>Pagado</th>
-        <th>Debe</th>
-        <th>Acciones</th>
-    </tr>
+    <thead>
+    <tr>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Pagado</th>
+            <th>Debe</th>
+            <th>Acciones</th>
+        </tr>
 
     @foreach (var d in Model.DeudasCliente)
     {
@@ -86,6 +100,7 @@
             </td>
         </tr>
     }
+    <thead>
 </table>
 
 <hr />
@@ -94,7 +109,7 @@
 <div class="modal fade show" id="modalDetalle"
      style="display:@(Model.ClienteIdActual != null ? "block" : "none"); background:rgba(0,0,0,0.5);">
 
-    <div class="modal-dialog modal-lg" style="max-width: 900px;">
+    <div class="modal-dialog modal-lg" style="max-width: 950px;">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -107,7 +122,7 @@
                 @if (Model.ClienteIdActual != null)
                 {
                     <table class="table">
-                        <tr style="background:#198754; color:white;">
+                        <tr>
                             <th>Producto</th>
                             <th>Fecha</th>
                             <th>Total</th>
