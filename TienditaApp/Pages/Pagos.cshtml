@@ -21,6 +21,9 @@
         border: 1px solid #ccc;
         border-radius: 5px;
     }
+    .table td, .table th {
+    white-space: nowrap;
+}
     table {
         width: 100%;
         border-collapse: collapse;
@@ -91,7 +94,7 @@
 <div class="modal fade show" id="modalDetalle"
      style="display:@(Model.ClienteIdActual != null ? "block" : "none"); background:rgba(0,0,0,0.5);">
 
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg" style="max-width: 900px;">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -110,6 +113,7 @@
                             <th>Total</th>
                             <th>Pagado</th>
                             <th>Debe</th>
+                            <th>Acciones</th>
                         </tr>
 
                         @foreach (var v in Model.VentasCliente)
