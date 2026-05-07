@@ -38,39 +38,112 @@
 
 <h1>Productos 📦</h1>
 
-<h2>@(Model.Producto.Id == 0 ? "Nuevo Producto" : "Editando Producto")</h2>
+<button class="btn btn-success mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#modalProducto">
+
+    ➕ Agregar Producto
+</button>
+
 <div asp-validation-summary="All" style="color:red; margin-bottom:10px;"></div>
 
-<form method="post">
+<div class="modal fade" id="modalProducto" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
 
-    <input type="hidden" asp-for="Producto.Id" />
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    @(Model.Producto.Id == 0 ? "Nuevo Producto" : "Editar Producto")
+                </h5>
 
-    <div>
-        <label>Nombre Producto:</label><br />
-        <input asp-for="Producto.Nombre" placeholder="Nombre" />
-        <span asp-validation-for="Producto.Nombre" style="color:red"></span>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <!-- FORM -->
+            <form method="post">
+
+                <div class="modal-body">
+
+                    <input type="hidden" asp-for="Producto.Id" />
+
+                    <div asp-validation-summary="All"
+                         style="color:red; margin-bottom:10px;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Nombre Producto
+                        </label>
+
+                        <input asp-for="Producto.Nombre"
+                               class="form-control"
+                               placeholder="Nombre" />
+
+                        <span asp-validation-for="Producto.Nombre"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Precio
+                        </label>
+
+                        <input asp-for="Producto.Precio"
+                               class="form-control"
+                               placeholder="Precio" />
+
+                        <span asp-validation-for="Producto.Precio"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Stock
+                        </label>
+
+                        <input asp-for="Producto.Stock"
+                               class="form-control"
+                               placeholder="Stock" />
+
+                        <span asp-validation-for="Producto.Stock"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        @(Model.Producto.Id == 0 ? "Guardar" : "Actualizar")
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
     </div>
+</div>
 
-    <div>
-        <label>Precio Producto:</label><br />
-        <input asp-for="Producto.Precio" placeholder="Precio" />
-        <span asp-validation-for="Producto.Precio" style="color:red"></span>
-    </div>
-
-    <div>
-        <label>Stock:</label><br />
-        <input asp-for="Producto.Stock" placeholder="Stock" />
-        <span asp-validation-for="Producto.Stock" style="color:red"></span>
-    </div>
-
-    <button type="submit">
-        @(Model.Producto.Id == 0 ? "Guardar" : "Actualizar")
-    </button>
-</form>
-
-<hr />
-
-<table>
+<div class="table-responsive">
+<table class="table table-hover table-bordered">
     <tr style="background:#0d6efd; color:white;">
         <th>Nombre</th>
         <th>Precio</th>
@@ -115,6 +188,7 @@
         </tr>
     }
 </table>
+</div>
 <nav>
     <ul class="pagination justify-content-center">
 

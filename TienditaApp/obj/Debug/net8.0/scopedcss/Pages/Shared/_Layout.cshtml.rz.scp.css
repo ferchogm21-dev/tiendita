@@ -1,48 +1,133 @@
-/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-a.navbar-brand[b-psyf2vznz5] {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
-}
+    <title>@ViewData["Title"] - TienditaApp</title>
 
-a[b-psyf2vznz5] {
-  color: #0077cc;
-}
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+          
+     <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-.btn-primary[b-psyf2vznz5] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+</head>
 
-.nav-pills .nav-link.active[b-psyf2vznz5], .nav-pills .show > .nav-link[b-psyf2vznz5] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
+<body>
 
-.border-top[b-psyf2vznz5] {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom[b-psyf2vznz5] {
-  border-bottom: 1px solid #e5e5e5;
-}
+    <!-- NAVBAR -->
+    <header>
 
-.box-shadow[b-psyf2vznz5] {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 
-button.accept-policy[b-psyf2vznz5] {
-  font-size: 1rem;
-  line-height: inherit;
-}
+            <div class="container-fluid">
 
-.footer[b-psyf2vznz5] {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-}
+                <a class="navbar-brand fw-bold"
+                   asp-page="/Index">
+
+                    🛒 TienditaApp
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#menu">
+
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse"
+                     id="menu">
+
+                    <ul class="navbar-nav me-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-page="/Index">
+                                Inicio
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-page="/Productos">
+                                Productos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-page="/Clientes">
+                                Clientes
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-page="/Ventas">
+                                Ventas
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-page="/Pagos">
+                                Pagos
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- CONTENIDO -->
+    <div class="container mt-4">
+
+        <main role="main">
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-top footer text-muted mt-4">
+
+        <div class="container text-center">
+
+            &copy; 2026 - TienditaApp
+
+        </div>
+
+    </footer>
+
+    <!-- SCRIPTS -->
+
+    <!-- jQuery -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JS -->
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html[b-psyf2vznz5]>

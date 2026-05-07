@@ -1,136 +1,230 @@
 @page
 @model TienditaApp.Pages.ClientesModel
 
-<h1>Clientes 👤</h1>
+<h1 class="mb-4">Clientes 👤</h1>
 
-<style>
-    input {
-        padding: 8px;
-        margin: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    tr:hover {
-        background-color: #f5f5f5;
-    }
-
-    button {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.8;
-    }
-</style>
-<div asp-validation-summary="All" style="color:red; margin-bottom:10px;"></div>
-<!-- FORMULARIO -->
-<form method="post">
-
-    <input type="hidden" asp-for="Cliente.Id" />
-
-    <div>
-        <label>Nombre Cliente:</label><br />
-        <input asp-for="Cliente.Nombre" placeholder="Nombre" />
-        <span asp-validation-for="Cliente.Nombre" style="color:red"></span>
+<!-- MENSAJE -->
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Mensaje"]
     </div>
-    <div>
-        <label>Télefono:</label><br />
-        <input asp-for="Cliente.Telefono" placeholder="Télefono" />
+}
+
+<!-- BOTON -->
+<button class="btn btn-success mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#modalCliente">
+
+    ➕ Agregar Cliente
+</button>
+
+<!-- MODAL -->
+<div class="modal fade" id="modalCliente" tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-success text-white">
+
+                <h5 class="modal-title">
+                    @(Model.Cliente.Id == 0
+                        ? "Nuevo Cliente"
+                        : "Editar Cliente")
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- FORM -->
+            <form method="post">
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           asp-for="Cliente.Id" />
+
+                    <div asp-validation-summary="All"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <!-- NOMBRE -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Nombre Cliente
+                        </label>
+
+                        <input asp-for="Cliente.Nombre"
+                               class="form-control"
+                               placeholder="Nombre" />
+
+                        <span asp-validation-for="Cliente.Nombre"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <!-- TELEFONO -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input asp-for="Cliente.Telefono"
+                               class="form-control"
+                               placeholder="Teléfono" />
+
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        @(Model.Cliente.Id == 0
+                            ? "Guardar"
+                            : "Actualizar")
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 
-    <button type="submit">
-        @(Model.Cliente.Id == 0 ? "Guardar" : "Actualizar")
-    </button>
-
-</form>
+</div>
 
 <hr />
 
-<h2>Lista de clientes</h2>
+<h3>Lista de clientes</h3>
 
-<table>
-    <tr style="background:#198754; color:white;">
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Acciones</th>
-    </tr>
-    @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    }
-    @if (TempData["Mensaje"] != null)
-    {
-        <div style="background:#d4edda; color:#155724; padding:10px; border-radius:5px; margin-bottom:10px;">
-            @TempData["Mensaje"]
-        </div>
-    }
-    @foreach (var item in Model.ListaClientes)
-    {
-        <tr style="text-align:center;">
-            <td>@item.Nombre</td>
-            <td>@item.Telefono</td>
-            <td>
+<div class="table-responsive">
 
-                <!-- ✏️ EDITAR (usa GET con id) -->
-                <a asp-page="Clientes"
-                asp-page-handler="Editar"
-                asp-route-id="@item.Id"
-                style="background:#0d6efd;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;">
-                ✏️ Editar
-                </a>
+    <table class="table table-hover table-bordered">
 
-                
+        <thead class="table-success">
 
-            <!-- 🗑 ELIMINAR -->
-            <form method="post" style="display:inline;">
-                <button type="submit"
-                        formaction="?handler=Eliminar&id=@item.Id"
-                        style="background:red;color:white;">
-                    🗑 Eliminar
-                </button>
-            </form>
+            <tr>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th style="width:220px;">Acciones</th>
+            </tr>
 
-        </td>
-    </tr>
-}
-</table>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model.ListaClientes)
+            {
+                <tr class="text-center">
+
+                    <td>@item.Nombre</td>
+
+                    <td>@item.Telefono</td>
+
+                    <td>
+
+                        <!-- EDITAR -->
+                        <a asp-page="Clientes"
+                           asp-page-handler="Editar"
+                           asp-route-id="@item.Id"
+                           class="btn btn-primary btn-sm">
+
+                            ✏️ Editar
+                        </a>
+
+                        <!-- ELIMINAR -->
+                        <form method="post"
+                              style="display:inline;">
+
+                            <button type="submit"
+                                    formaction="?handler=Eliminar&id=@item.Id"
+                                    class="btn btn-danger btn-sm">
+
+                                🗑 Eliminar
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- PAGINACION -->
 <nav>
+
     <ul class="pagination justify-content-center">
 
-        <!-- Anterior -->
+        <!-- ANTERIOR -->
         <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-            <a class="page-link" href="?pageNumber=@(Model.PageNumber - 1)">
+
+            <a class="page-link"
+               href="?pageNumber=@(Model.PageNumber - 1)">
+
                 «
             </a>
+
         </li>
 
-        <!-- Números -->
+        <!-- NUMEROS -->
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                <a class="page-link" href="?pageNumber=@i">@i</a>
+
+                <a class="page-link"
+                   href="?pageNumber=@i">
+
+                    @i
+                </a>
+
             </li>
         }
 
-        <!-- Siguiente -->
+        <!-- SIGUIENTE -->
         <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="?pageNumber=@(Model.PageNumber + 1)">
+
+            <a class="page-link"
+               href="?pageNumber=@(Model.PageNumber + 1)">
+
                 »
             </a>
+
         </li>
 
     </ul>
+
 </nav>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

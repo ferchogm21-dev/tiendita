@@ -1,75 +1,8 @@
 @page
 @model VentasModel
-
 <style>
-body {
-    background: #f5f7fa;
-    font-family: Arial, sans-serif;
-}
 
-/* CARD */
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
-}
-
-/* INPUTS */
-select, input {
-    padding: 10px;
-    margin: 8px 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    width: 220px;
-}
-
-/* BOTÓN */
-button {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-button:hover {
-    opacity: 0.8;
-}
-
-/* INFO */
-.info {
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-/* STOCK */
-.stock { color: green; }
-.bajo-stock { color: red; }
-
-/* TABLA */
-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-th {
-    background: red;
-    color: white;
-    padding: 12px;
-}
-
-td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-/* 🔥 TIPO DE VENTA MODERNO */
+/* TIPO DE VENTA */
 .tipo-venta {
     display: flex;
     gap: 15px;
@@ -77,140 +10,324 @@ td {
 }
 
 .tipo-venta label {
+
     flex: 1;
+
     text-align: center;
-    padding: 12px;
-    border-radius: 10px;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
     border: 2px solid #ddd;
+
     cursor: pointer;
+
     transition: 0.3s;
+
     font-weight: bold;
+
+    user-select: none;
 }
 
+/* OCULTAR RADIO */
 .tipo-venta input {
     display: none;
 }
 
-/* CONTADO */
+/* CONTADO ACTIVO */
 .tipo-venta label:first-child:has(input:checked) {
+
     background: #198754;
+
     color: white;
+
     border-color: #198754;
+
+    box-shadow: 0 0 10px rgba(25,135,84,0.4);
 }
 
-/* FIADO */
+/* FIADO ACTIVO */
 .tipo-venta label:last-child:has(input:checked) {
+
     background: #ffc107;
+
     color: black;
+
     border-color: #ffc107;
+
+    box-shadow: 0 0 10px rgba(255,193,7,0.4);
 }
+
+/* HOVER */
+.tipo-venta label:hover {
+    transform: scale(1.02);
+}
+
 </style>
+<h1 class="mb-4">🧾 Ventas</h1>
 
-<h1>🧾 Ventas</h1>
+<!-- CARD -->
+<div class="card shadow-lg border-0 mb-4">
 
-<div class="card">
+    <div class="card-body">
 
-<form method="post" onsubmit="return validarVenta()">
+        <form method="post"
+              onsubmit="return validarVenta()">
 
-    <select id="productoSelect" name="Venta.ProductoId">
-    <option value="">Selecciona producto</option>
+            <div class="row g-3">
 
-        @foreach (var p in Model.Productos)
-        {
-            <option 
-                value="@p.Id"
-                data-precio="@p.Precio"
-                data-stock="@p.Stock">
-                @p.Nombre
-            </option>
-        }
-    </select>
+                <!-- PRODUCTO -->
+                <div class="col-md-4">
 
-    <select id="clienteSelect" name="Venta.ClienteId">
-        <option value="">Selecciona cliente</option>
-        @foreach (var c in Model.Clientes)
-        {
-            <option value="@c.Id">@c.Nombre</option>
-        }
-    </select>
+                    <label class="form-label fw-bold">
+                        Producto
+                    </label>
 
-    <input type="number" id="cantidad" name="Venta.Cantidad" placeholder="Cantidad" />
+                    <select id="productoSelect"
+                            name="Venta.ProductoId"
+                            class="form-select">
 
-    <!-- 🔥 TIPO DE VENTA -->
-    <div class="tipo-venta">
-        <label>
-            <input type="radio" name="Venta.EsFiado" value="false" checked />
-            💵 Contado
-        </label>
+                        <option value="">
+                            Selecciona producto
+                        </option>
 
-        <label>
-            <input type="radio" name="Venta.EsFiado" value="true" />
-            🧾 Fiado
-        </label>
+                        @foreach (var p in Model.Productos)
+                        {
+                            <option value="@p.Id"
+                                    data-precio="@p.Precio"
+                                    data-stock="@p.Stock">
+
+                                @p.Nombre
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <!-- CLIENTE -->
+                <div class="col-md-4">
+
+                    <label class="form-label fw-bold">
+                        Cliente
+                    </label>
+
+                    <select id="clienteSelect"
+                            name="Venta.ClienteId"
+                            class="form-select">
+
+                        <option value="">
+                            Selecciona cliente
+                        </option>
+
+                        @foreach (var c in Model.Clientes)
+                        {
+                            <option value="@c.Id">
+                                @c.Nombre
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <!-- CANTIDAD -->
+                <div class="col-md-4">
+
+                    <label class="form-label fw-bold">
+                        Cantidad
+                    </label>
+
+                    <input type="number"
+                           id="cantidad"
+                           name="Venta.Cantidad"
+                           class="form-control"
+                           placeholder="Cantidad" />
+
+                </div>
+
+            </div>
+
+            <!-- TIPO -->
+            <div class="mt-4">
+
+                <label class="form-label fw-bold">
+                    Tipo de venta
+                </label>
+
+                <!-- 🔥 TIPO DE VENTA -->
+                <div class="mt-4">
+
+                    <label class="form-label fw-bold">
+                        Tipo de venta
+                    </label>
+
+                    <div class="tipo-venta">
+
+                        <!-- CONTADO -->
+                        <label>
+
+                            <input type="radio"
+                                name="Venta.EsFiado"
+                                value="false"
+                                checked />
+
+                            💵 Contado
+
+                        </label>
+
+                        <!-- FIADO -->
+                        <label>
+
+                            <input type="radio"
+                                name="Venta.EsFiado"
+                                value="true" />
+
+                            🧾 Fiado
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INFO -->
+            <div class="alert alert-light border mt-4">
+
+                <div class="row text-center">
+
+                    <div class="col-md-4">
+                        <strong>Precio:</strong>
+                        $<span id="precio">0</span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Stock:</strong>
+                        <span id="stock">0</span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Total:</strong>
+                        $<span id="total">0</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BOTON -->
+            <div class="text-end mt-3">
+
+                <button type="submit"
+                        id="btnVender"
+                        class="btn btn-success btn-lg">
+
+                    💰 Vender
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
-
-    <div class="info">
-        Precio: $<span id="precio">0</span> |
-        Stock: <span id="stock">0</span> |
-        Total: $<span id="total">0</span>
-    </div>
-
-    <br />
-
-    <button type="submit" id="btnVender">💰 Vender</button>
-
-</form>
 
 </div>
 
-<hr />
+<!-- HISTORIAL -->
+<div class="card shadow border-0">
 
-<h2>📊 Historial</h2>
+    <div class="card-body">
 
-<table>
-    <tr>
-        <th>Producto</th>
-        <th>Cliente</th>
-        <th>Cantidad</th>
-        <th>Tipo</th>
-        <th>Fecha</th>
-        <th>Total</th>
-    </tr>
+        <h3 class="mb-3">📊 Historial</h3>
 
-    @foreach (var v in Model.ListaVentas)
-    {
-        <tr>
-            <td>@v.Producto</td>
-            <td>@v.Cliente</td>
-            <td>@v.Cantidad</td>            
-            <td>
-                @if (v.EsFiado)
-                {
-                    <span style="background:#ffc107; padding:5px 10px; border-radius:10px;">
-                        🧾 Fiado
-                    </span>
-                }
-                else
-                {
-                    <span style="background:#198754; color:white; padding:5px 10px; border-radius:10px;">
-                        💵 Contado
-                    </span>
-                }
-            </td>
-            <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-            <td>$@v.Total</td>
-        </tr>
-    }
-</table>
-<nav>
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-danger">
+
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cliente</th>
+                        <th>Cantidad</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var v in Model.ListaVentas)
+                    {
+                        <tr>
+
+                            <td>@v.Producto</td>
+
+                            <td>@v.Cliente</td>
+
+                            <td>@v.Cantidad</td>
+
+                            <td>
+
+                                @if (v.EsFiado)
+                                {
+                                    <span class="badge bg-warning text-dark p-2">
+                                        🧾 Fiado
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success p-2">
+                                        💵 Contado
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+                                @v.Fecha.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+
+                            <td class="fw-bold">
+                                $@v.Total
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PAGINACION -->
+<nav class="mt-4">
+
     <ul class="pagination justify-content-center">
 
-        <!-- Anterior -->
+        <!-- ANTERIOR -->
         <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-            <a class="page-link" href="?pageNumber=@(Model.PageNumber - 1)">«</a>
+
+            <a class="page-link"
+               href="?pageNumber=@(Model.PageNumber - 1)">
+
+                «
+            </a>
+
         </li>
 
-        <!-- Números inteligentes -->
+        <!-- PAGINAS -->
         @{
             int start = Math.Max(1, Model.PageNumber - 2);
             int end = Math.Min(Model.TotalPages, Model.PageNumber + 2);
@@ -219,80 +336,127 @@ td {
         @for (int i = start; i <= end; i++)
         {
             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                <a class="page-link" href="?pageNumber=@i">@i</a>
+
+                <a class="page-link"
+                   href="?pageNumber=@i">
+
+                    @i
+                </a>
+
             </li>
         }
 
-        <!-- Siguiente -->
+        <!-- SIGUIENTE -->
         <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="?pageNumber=@(Model.PageNumber + 1)">»</a>
+
+            <a class="page-link"
+               href="?pageNumber=@(Model.PageNumber + 1)">
+
+                »
+            </a>
+
         </li>
 
     </ul>
+
 </nav>
 
 <script>
+
 const productoSelect = document.getElementById("productoSelect");
 const cantidadInput = document.getElementById("cantidad");
+
 const precioSpan = document.getElementById("precio");
 const stockSpan = document.getElementById("stock");
 const totalSpan = document.getElementById("total");
+
 const boton = document.getElementById("btnVender");
 
 function actualizarInfo() {
-    const selected = productoSelect.options[productoSelect.selectedIndex];
+
+    const selected =
+        productoSelect.options[productoSelect.selectedIndex];
 
     if (!selected || !selected.value) {
+
         precioSpan.textContent = 0;
         stockSpan.textContent = 0;
         totalSpan.textContent = 0;
+
         boton.disabled = true;
+
         return;
     }
 
-    const precio = parseFloat(selected.getAttribute("data-precio")) || 0;
-    const stock = parseInt(selected.getAttribute("data-stock")) || 0;
-    const cantidad = parseInt(cantidadInput.value) || 0;
+    const precio =
+        parseFloat(selected.getAttribute("data-precio")) || 0;
+
+    const stock =
+        parseInt(selected.getAttribute("data-stock")) || 0;
+
+    const cantidad =
+        parseInt(cantidadInput.value) || 0;
 
     precioSpan.textContent = precio;
     stockSpan.textContent = stock;
     totalSpan.textContent = precio * cantidad;
 
-    stockSpan.className = stock <= 5 ? "bajo-stock" : "stock";
+    if (stock <= 5) {
+
+        stockSpan.className = "text-danger fw-bold";
+
+    } else {
+
+        stockSpan.className = "text-success fw-bold";
+    }
 
     if (stock === 0 || cantidad > stock || cantidad <= 0) {
+
         boton.disabled = true;
-        boton.style.background = "gray";
+
     } else {
+
         boton.disabled = false;
-        boton.style.background = "#198754";
     }
 }
 
 function validarVenta() {
-    const selected = productoSelect.options[productoSelect.selectedIndex];
-    const clienteSelect = document.getElementById("clienteSelect");
-    const selectedCliente = clienteSelect.options[clienteSelect.selectedIndex];
+
+    const selected =
+        productoSelect.options[productoSelect.selectedIndex];
+
+    const clienteSelect =
+        document.getElementById("clienteSelect");
+
+    const selectedCliente =
+        clienteSelect.options[clienteSelect.selectedIndex];
 
     if (!selected || !selected.value) {
+
         alert("❌ Selecciona un producto");
         return false;
     }
 
     if (!selectedCliente || !selectedCliente.value) {
+
         alert("❌ Selecciona un cliente");
         return false;
     }
 
-    const stock = parseInt(selected.getAttribute("data-stock")) || 0;
-    const cantidad = parseInt(cantidadInput.value) || 0;
+    const stock =
+        parseInt(selected.getAttribute("data-stock")) || 0;
+
+    const cantidad =
+        parseInt(cantidadInput.value) || 0;
 
     if (stock === 0) {
+
         alert("❌ No hay stock disponible");
         return false;
     }
 
     if (cantidad > stock) {
+
         alert("⚠️ Stock insuficiente");
         return false;
     }
@@ -302,4 +466,5 @@ function validarVenta() {
 
 productoSelect.addEventListener("change", actualizarInfo);
 cantidadInput.addEventListener("input", actualizarInfo);
+
 </script>

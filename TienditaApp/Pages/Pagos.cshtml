@@ -1,6 +1,86 @@
 @page
 @model TienditaApp.Pages.PagosModel
 
+<style>
+
+body {
+    background: #f5f7fa;
+    font-family: Arial, sans-serif;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* TABLAS */
+.table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    background: #ffc107;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* HOVER */
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* INPUTS */
+input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* BOTONES */
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    transition: 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* MODAL */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    background: #ffc107;
+    color: black;
+}
+
+/* DEUDA */
+.deuda {
+    color: red;
+    font-weight: bold;
+}
+
+</style>
+
 <h1>💰 Pagos / Deudores</h1>
 
 @if (TempData["Error"] != null)
@@ -10,57 +90,25 @@
     </div>
 }
 
-<h3>💰 Total que deben todos: $@Model.TotalGeneralDeuda</h3>
+<div class="card">
+
+    <h3 class="mb-0">
+        💰 Total que deben todos:
+        <span class="text-danger">
+            $@Model.TotalGeneralDeuda
+        </span>
+    </h3>
+
+</div>
 <hr />
 
 <h2>Clientes con deuda</h2>
-<style>
-    body {
-        background: #f5f7fa;
-        font-family: Arial, sans-serif;
-    }
 
-    /* INPUTS */
-    input {
-        padding: 10px;
-        margin: 8px 5px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-    }
+<div class="card">
 
-    /* TABLA (MISMO ESTILO QUE LA OTRA) */
-    .table th {
-    background: #ffc107;
-    color: white;
-    
-}
+<div class="table-responsive">
 
-    /* CELDAS */
-    td {
-        padding: 10px;
-        text-align: center;
-        border-bottom: 1px solid #eee;
-        white-space: nowrap;
-    }
-
-    /* HOVER FILAS */
-    tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* BOTONES */
-    button {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.8;
-    }
-</style>
-<table class="table">
+<table class="table table-hover align-middle">
     <thead>
     <tr>
             <th>Cliente</th>
@@ -83,30 +131,37 @@
             <td>@d.ClienteNombre</td>
             <td>$@d.TotalDeuda</td>
             <td>$@d.TotalPagado</td>
-            <td style="color:red;">$@d.Debe</td>
+            <td class="deuda">$@d.Debe</td>
             <td>
                 <a asp-page="Pagos"
                    asp-route-clienteId="@d.ClienteId"
-                   class="btn btn-info">
+                   class="btn btn-primary btn-sm">
                    👁️ Ver detalles
                 </a>
-                <a href="@link" target="_blank"
-                class="btn btn-sm btn-success">
-                    <i class="bi bi-whatsapp"></i> WhatsApp
-                </a>
+                <a href="@link"
+                    target="_blank"
+                    class="btn btn-success btn-sm">
+
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+
+                    </a>
             </td>
         </tr>
     }
     <thead>
 </table>
+</div>
+
+</div>
 
 <hr />
 
 <!-- 🔥 MODAL -->
-<div class="modal fade show" id="modalDetalle"
+<div class="modal fade show"
+     id="modalDetalle"
      style="display:@(Model.ClienteIdActual != null ? "block" : "none"); background:rgba(0,0,0,0.5);">
 
-    <div class="modal-dialog modal-lg" style="max-width: 950px;">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -118,7 +173,9 @@
 
                 @if (Model.ClienteIdActual != null)
                 {
-                    <table class="table">
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
                         <tr>
                             <th>Producto</th>
                             <th>Fecha</th>
@@ -137,7 +194,7 @@
                                 <td>@v.Fecha.ToString("dd/MM/yyyy")</td>
                                 <td>$@v.Total</td>
                                 <td>$@v.Pagado</td>
-                                <td style="color:red;">$@debe</td>
+                                <td class="deuda">$@debe</td>
 
                                 <td>
                                     @if (debe > 0)
@@ -149,7 +206,7 @@
                                                 <input type="hidden" name="ventaId" value="@v.Id" />
                                                 <input type="hidden" name="clienteId" value="@Model.ClienteIdActual" />
                                                 <input type="number" step="0.01" name="abono" placeholder="$" style="width:70px;" />
-                                                <button style="background:#0d6efd;color:white;">Abonar 💰</button>
+                                                <button class="btn btn-primary btn-sm">Abonar 💰</button>
                                             </form>
 
                                             <!-- ✔ LIQUIDAR -->
@@ -167,7 +224,7 @@
                                         <form method="post" asp-page-handler="DeshacerLiquidacion">
                                             <input type="hidden" name="ventaId" value="@v.Id" />
                                             <input type="hidden" name="clienteId" value="@Model.ClienteIdActual" />
-                                            <button style="background:#dc3545;color:white;">
+                                            <button class="btn btn-success btn-sm">
                                                 ↩
                                             </button>
                                         </form>
@@ -176,6 +233,7 @@
                             </tr>
                         }
                     </table>
+                    </div>
                 }
                 <script>
                 function validarAbono(form) {
