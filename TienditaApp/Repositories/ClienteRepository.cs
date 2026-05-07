@@ -12,27 +12,52 @@ public class ClienteRepository
     }
 
     // 🔹 Obtener todos
-    public List<Cliente> ObtenerClientes()
+    public List<Cliente> ObtenerClientes(int usuarioId, string rol)
     {
         using var connection = _context.CreateConnection();
-        var sql = "SELECT * FROM Clientes";
-        return connection.Query<Cliente>(sql).ToList();
+
+        string sql = rol == "ADMIN"
+            ? "SELECT * FROM Clientes"
+            : "SELECT * FROM Clientes WHERE UsuarioId = @UsuarioId";
+
+        return connection.Query<Cliente>(sql, new
+        {
+            UsuarioId = usuarioId
+        }).ToList();
     }
 
     // 🔹 Obtener por Id
-    public Cliente ObtenerPorId(int id)
+    public Cliente ObtenerPorId(int id, int usuarioId, string rol)
     {
         using var connection = _context.CreateConnection();
-        var sql = "SELECT * FROM Clientes WHERE Id = @Id";
-        return connection.QueryFirstOrDefault<Cliente>(sql, new { Id = id }) ?? new Cliente();
+
+        string sql = rol == "ADMIN"
+            ? "SELECT * FROM Clientes WHERE Id = @Id"
+            : @"SELECT * FROM Clientes
+               WHERE Id = @Id
+               AND UsuarioId = @UsuarioId";
+
+        return connection.QueryFirstOrDefault<Cliente>(
+            sql,
+            new
+            {
+                Id = id,
+                UsuarioId = usuarioId
+            }) ?? new Cliente();
     }
 
     // 🔹 Insertar
     public void Agregar(Cliente cliente)
     {
         using var connection = _context.CreateConnection();
-        var sql = @"INSERT INTO Clientes (Nombre, Telefono)
-                    VALUES (@Nombre, @Telefono)";
+
+        var sql = @"
+            INSERT INTO Clientes
+            (Nombre, Telefono, UsuarioId)
+            VALUES
+            (@Nombre, @Telefono, @UsuarioId)
+        ";
+
         connection.Execute(sql, cliente);
     }
 
@@ -40,41 +65,76 @@ public class ClienteRepository
     public void Actualizar(Cliente cliente)
     {
         using var connection = _context.CreateConnection();
-        var sql = @"UPDATE Clientes 
-                    SET Nombre = @Nombre, Telefono = @Telefono
-                    WHERE Id = @Id";
+
+        var sql = @"
+            UPDATE Clientes
+            SET Nombre = @Nombre,
+                Telefono = @Telefono
+            WHERE Id = @Id
+            AND UsuarioId = @UsuarioId
+        ";
+
         connection.Execute(sql, cliente);
     }
 
     // 🔹 Eliminar
-    public void Eliminar(int id)
+    public void Eliminar(int id, int usuarioId, string rol)
     {
         using var connection = _context.CreateConnection();
-        var sql = "DELETE FROM Clientes WHERE Id = @Id";
-        connection.Execute(sql, new { Id = id });
+
+        string sql = rol == "ADMIN"
+            ? "DELETE FROM Clientes WHERE Id = @Id"
+            : @"DELETE FROM Clientes
+               WHERE Id = @Id
+               AND UsuarioId = @UsuarioId";
+
+        connection.Execute(sql, new
+        {
+            Id = id,
+            UsuarioId = usuarioId
+        });
     }
 
-    public IEnumerable<Cliente> ObtenerPaginados(int pageNumber, int pageSize)
+    // 🔹 Obtener paginados
+    public IEnumerable<Cliente> ObtenerPaginados(
+        int pageNumber,
+        int pageSize,
+        int usuarioId,
+        string rol)
     {
         using var connection = _context.CreateConnection();
 
         var offset = (pageNumber - 1) * pageSize;
 
-        var sql = @"SELECT * FROM Clientes
-                    ORDER BY Id DESC
-                    LIMIT @PageSize OFFSET @Offset";
+        string sql = rol == "ADMIN"
+            ? @"SELECT * FROM Clientes
+                ORDER BY Id DESC
+                LIMIT @PageSize OFFSET @Offset"
+            : @"SELECT * FROM Clientes
+                WHERE UsuarioId = @UsuarioId
+                ORDER BY Id DESC
+                LIMIT @PageSize OFFSET @Offset";
 
         return connection.Query<Cliente>(sql, new
         {
+            UsuarioId = usuarioId,
             PageSize = pageSize,
             Offset = offset
         });
     }
 
-    public int ObtenerTotal()
+    // 🔹 Obtener total
+    public int ObtenerTotal(int usuarioId, string rol)
     {
         using var connection = _context.CreateConnection();
-        return connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Clientes");
+
+        string sql = rol == "ADMIN"
+            ? "SELECT COUNT(*) FROM Clientes"
+            : "SELECT COUNT(*) FROM Clientes WHERE UsuarioId = @UsuarioId";
+
+        return connection.ExecuteScalar<int>(sql, new
+        {
+            UsuarioId = usuarioId
+        });
     }
-    
 }

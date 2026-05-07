@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.Sqlite;
 
-
 namespace TienditaApp.Pages
 {
     public class LoginModel : PageModel
@@ -15,35 +14,98 @@ namespace TienditaApp.Pages
 
         public string Error { get; set; } = "";
 
+        // 🔹 GET
+        public IActionResult OnGet()
+        {
+            if (HttpContext.Session.GetString("Usuario") != null)
+            {
+                return RedirectToPage("/Index");
+            }
+
+            return Page();
+        }
+
+        // 🔹 LOGIN
         public IActionResult OnPost()
         {
-            using var connection = new SqliteConnection("Data Source=tienda.db");
+            using var connection =
+                new SqliteConnection("Data Source=tienda.db");
+
             connection.Open();
 
             var command = connection.CreateCommand();
+
             command.CommandText = @"
-                SELECT COUNT(*) 
-                FROM Usuarios 
-                WHERE Usuario = $user AND Password = $pass
+                SELECT
+                    Id,
+                    Nombre,
+                    Rol,
+                    NombreNegocio
+                FROM Usuarios
+                WHERE Usuario = $user
+                AND Password = $pass
             ";
 
-            command.Parameters.AddWithValue("$user", Usuario);
-            command.Parameters.AddWithValue("$pass", Password);
+            command.Parameters.AddWithValue(
+                "$user",
+                Usuario);
 
-            long result = (long)(command.ExecuteScalar() ?? 0L);
+            command.Parameters.AddWithValue(
+                "$pass",
+                Password);
 
-            if (result > 0)
+            using var reader = command.ExecuteReader();
+
+            if (reader.Read())
             {
-                HttpContext.Session.SetString("Usuario", Usuario);
+                int idUsuario = reader.GetInt32(0);
+
+                string nombre = reader.IsDBNull(1)
+                    ? ""
+                    : reader.GetString(1);
+
+                string rol = reader.IsDBNull(2)
+                    ? "USER"
+                    : reader.GetString(2);
+
+                string negocio = reader.IsDBNull(3)
+                    ? "Mi Tiendita"
+                    : reader.GetString(3);
+
+                // 🔥 SESIÓN
+                HttpContext.Session.SetInt32(
+                    "UsuarioId",
+                    idUsuario);
+
+                HttpContext.Session.SetString(
+                    "Nombre",
+                    nombre);
+
+                HttpContext.Session.SetString(
+                    "Usuario",
+                    Usuario);
+
+                HttpContext.Session.SetString(
+                    "Rol",
+                    rol);
+
+                HttpContext.Session.SetString(
+                    "Negocio",
+                    negocio);
+
                 return RedirectToPage("/Index");
             }
 
             Error = "Usuario o contraseña incorrectos";
+
             return Page();
         }
+
+        // 🔹 LOGOUT
         public IActionResult OnPostLogout()
         {
             HttpContext.Session.Clear();
+
             return RedirectToPage("/Login");
         }
     }

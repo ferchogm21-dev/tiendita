@@ -20,6 +20,7 @@ public class ClientesModel : PageModel
     public List<Cliente> ListaClientes { get; set; } = new();
 
     public int PageNumber { get; set; }
+
     public int TotalPages { get; set; }
 
     // =========================
@@ -27,15 +28,24 @@ public class ClientesModel : PageModel
     // =========================
     private void CargarClientes(int pageNumber)
     {
+        int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+
+        string rol = HttpContext.Session.GetString("Rol") ?? "";
+
         int pageSize = 10;
 
         PageNumber = pageNumber;
 
         ListaClientes = _clienteRepo
-            .ObtenerPaginados(PageNumber, pageSize)
+            .ObtenerPaginados(
+                PageNumber,
+                pageSize,
+                usuarioId,
+                rol)
             .ToList();
 
-        var total = _clienteRepo.ObtenerTotal();
+        var total = _clienteRepo.ObtenerTotal(usuarioId, rol);
+
         TotalPages = (int)Math.Ceiling(total / (double)pageSize);
     }
 
@@ -70,15 +80,22 @@ public class ClientesModel : PageModel
             return Page();
         }
 
+        // 🔥 Asignar usuario actual
+        Cliente.UsuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+
         if (Cliente.Id == 0)
         {
             _clienteRepo.Agregar(Cliente);
-            TempData["Mensaje"] = "Cliente guardado correctamente ✅";
+
+            TempData["Mensaje"] =
+                "Cliente guardado correctamente ✅";
         }
         else
         {
             _clienteRepo.Actualizar(Cliente);
-            TempData["Mensaje"] = "Cliente actualizado correctamente ✏️";
+
+            TempData["Mensaje"] =
+                "Cliente actualizado correctamente ✏️";
         }
 
         return RedirectToPage(new { pageNumber });
@@ -94,13 +111,22 @@ public class ClientesModel : PageModel
             return RedirectToPage("/Login");
         }
 
+        int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+
+        string rol = HttpContext.Session.GetString("Rol") ?? "";
+
         CargarClientes(pageNumber);
 
-        Cliente = _clienteRepo.ObtenerPorId(id);
+        Cliente = _clienteRepo.ObtenerPorId(
+            id,
+            usuarioId,
+            rol);
 
-        if (Cliente == null)
+        if (Cliente == null || Cliente.Id == 0)
         {
-            TempData["Mensaje"] = "Cliente no encontrado ❌";
+            TempData["Mensaje"] =
+                "Cliente no encontrado ❌";
+
             return RedirectToPage(new { pageNumber });
         }
 
@@ -117,9 +143,14 @@ public class ClientesModel : PageModel
             return RedirectToPage("/Login");
         }
 
-        _clienteRepo.Eliminar(id);
+        int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
 
-        TempData["Mensaje"] = "Cliente eliminado 🗑️";
+        string rol = HttpContext.Session.GetString("Rol") ?? "";
+
+        _clienteRepo.Eliminar(id, usuarioId, rol);
+
+        TempData["Mensaje"] =
+            "Cliente eliminado 🗑️";
 
         return RedirectToPage(new { pageNumber });
     }

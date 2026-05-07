@@ -4,7 +4,9 @@ public class Venta
 {
     public int Id { get; set; }
 
-    public int ProductoId  { get; set; }
+    public int UsuarioId { get; set; }
+
+    public int ProductoId { get; set; }
 
     public int Cantidad { get; set; }
 
@@ -14,7 +16,7 @@ public class Venta
 
     public int ClienteId { get; set; }
 
-    // Este campo lo llenas manualmente desde el SELECT (JOIN)
+    // 🔹 Campo llenado desde JOIN
     public string ClienteNombre { get; set; } = "";
 
     public bool EsFiado { get; set; }
@@ -23,7 +25,7 @@ public class Venta
 
     public DateTime? FechaPago { get; set; }
 
-    // Propiedad calculada (Dapper la ignora automáticamente)
+    // 🔹 Propiedad calculada
     public decimal Saldo => Total - (Pagado ?? 0);
 
     public string? ProductoNombre { get; set; }

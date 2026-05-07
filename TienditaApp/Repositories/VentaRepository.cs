@@ -14,18 +14,24 @@ namespace TienditaApp.Repositories
             _context = context;
         }
 
+        // 🔹 Registrar venta
         public void RegistrarVenta(Venta venta)
         {
             using var connection = _context.CreateConnection();
 
-            // 🔥 Buscar producto por ID
+            // 🔥 Buscar producto SOLO del usuario
             var producto = connection.QueryFirstOrDefault<Producto>(
-            "SELECT * FROM Productos WHERE Id = @Id",
-            new { Id = venta.ProductoId }) ?? throw new Exception("Producto no encontrado");
-            if (producto.Stock < venta.Cantidad)
-                throw new Exception("Stock insuficiente");
+                @"SELECT * 
+                  FROM Productos 
+                  WHERE Id = @Id
+                  AND UsuarioId = @UsuarioId",
+                new
+                {
+                    Id = venta.ProductoId,
+                    UsuarioId = venta.UsuarioId
+                }) ?? throw new Exception("Producto no encontrado");
 
-            if (venta.Cantidad > producto.Stock)
+            if (producto.Stock < venta.Cantidad)
                 throw new Exception("Stock insuficiente");
 
             venta.Total = producto.Precio * venta.Cantidad;
@@ -42,111 +48,239 @@ namespace TienditaApp.Repositories
 
             venta.Fecha = DateTime.Now;
 
+            // 🔥 Registrar venta
             connection.Execute(@"
-            INSERT INTO Ventas 
-            (ProductoId, ClienteId, Cantidad, Total, EsFiado, Pagado, Fecha)
-            VALUES 
-            (@ProductoId, @ClienteId, @Cantidad, @Total, @EsFiado, @Pagado, @Fecha)
+                INSERT INTO Ventas
+                (
+                    ProductoId,
+                    ClienteId,
+                    Cantidad,
+                    Total,
+                    EsFiado,
+                    Pagado,
+                    Fecha,
+                    UsuarioId
+                )
+                VALUES
+                (
+                    @ProductoId,
+                    @ClienteId,
+                    @Cantidad,
+                    @Total,
+                    @EsFiado,
+                    @Pagado,
+                    @Fecha,
+                    @UsuarioId
+                )
             ", venta);
 
-            // 🔥 Descontar stock usando el ID real del producto
+            // 🔥 Descontar stock
             connection.Execute(@"
-            UPDATE Productos 
-            SET Stock = Stock - @Cantidad 
-            WHERE Id = @Id AND Stock >= @Cantidad
-            ", new { Cantidad = venta.Cantidad, Id = producto.Id });
+                UPDATE Productos
+                SET Stock = Stock - @Cantidad
+                WHERE Id = @Id
+                AND UsuarioId = @UsuarioId
+                AND Stock >= @Cantidad
+            ",
+            new
+            {
+                Cantidad = venta.Cantidad,
+                Id = producto.Id,
+                UsuarioId = venta.UsuarioId
+            });
         }
 
-        public List<VentaDTO> ObtenerVentas()
+        // 🔹 Obtener ventas
+        public List<VentaDTO> ObtenerVentas(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
 
-            return connection.Query<VentaDTO>(@"
-            SELECT 
-                v.Id,
-                p.Nombre AS Producto,
-                c.Nombre AS Cliente,
-                v.Cantidad,
-                v.Total,
-                v.EsFiado,
-                v.Fecha
-            FROM Ventas v
-            LEFT JOIN Productos p ON p.Id = v.ProductoId
-            LEFT JOIN Clientes c ON c.Id = v.ClienteId
-            ORDER BY v.Id DESC
-            ").ToList();
+            string sql = rol == "ADMIN"
+                ? @"
+                    SELECT
+                        v.Id,
+                        p.Nombre AS Producto,
+                        c.Nombre AS Cliente,
+                        v.Cantidad,
+                        v.Total,
+                        v.EsFiado,
+                        v.Fecha,
+                        IFNULL(v.Pagado,0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Productos p ON p.Id = v.ProductoId
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    ORDER BY v.Id DESC
+                "
+                : @"
+                    SELECT
+                        v.Id,
+                        p.Nombre AS Producto,
+                        c.Nombre AS Cliente,
+                        v.Cantidad,
+                        v.Total,
+                        v.EsFiado,
+                        v.Fecha,
+                        IFNULL(v.Pagado,0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Productos p ON p.Id = v.ProductoId
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    WHERE v.UsuarioId = @UsuarioId
+                    ORDER BY v.Id DESC
+                ";
+
+            return connection.Query<VentaDTO>(sql, new
+            {
+                UsuarioId = usuarioId
+            }).ToList();
         }
-        public List<ClienteDeuda> ObtenerDeudas()
+
+        // 🔹 Obtener deudas
+        public List<ClienteDeuda> ObtenerDeudas(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
 
-            return connection.Query<ClienteDeuda>(@"
-                SELECT 
-                    v.ClienteId,
-                    c.Nombre AS ClienteNombre,
-                    SUM(v.Total) AS TotalDeuda,
-                    SUM(v.Pagado) AS TotalPagado
-                FROM Ventas v
-                LEFT JOIN Clientes c ON c.Id = v.ClienteId
-                WHERE v.EsFiado = 1
-                GROUP BY v.ClienteId, c.Nombre
-            ").ToList();
+            string sql = rol == "ADMIN"
+                ? @"
+                    SELECT
+                        v.ClienteId,
+                        c.Nombre AS ClienteNombre,
+                        SUM(v.Total) AS TotalDeuda,
+                        SUM(v.Pagado) AS TotalPagado
+                    FROM Ventas v
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    WHERE v.EsFiado = 1
+                    GROUP BY v.ClienteId, c.Nombre
+                "
+                : @"
+                    SELECT
+                        v.ClienteId,
+                        c.Nombre AS ClienteNombre,
+                        SUM(v.Total) AS TotalDeuda,
+                        SUM(v.Pagado) AS TotalPagado
+                    FROM Ventas v
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    WHERE v.EsFiado = 1
+                    AND v.UsuarioId = @UsuarioId
+                    GROUP BY v.ClienteId, c.Nombre
+                ";
+
+            return connection.Query<ClienteDeuda>(sql, new
+            {
+                UsuarioId = usuarioId
+            }).ToList();
         }
-        public IEnumerable<Venta> ObtenerPaginados(int pageNumber, int pageSize)
+
+        // 🔹 Obtener paginados
+        public IEnumerable<Venta> ObtenerPaginados(
+            int pageNumber,
+            int pageSize,
+            int usuarioId,
+            string rol)
         {
             using var connection = _context.CreateConnection();
 
             var offset = (pageNumber - 1) * pageSize;
 
-            var sql = @"
-            SELECT v.*, 
-                c.Nombre AS ClienteNombre,
-                (v.Total - IFNULL(v.Pagado,0)) AS Saldo
-            FROM Ventas v
-            LEFT JOIN Clientes c ON c.Id = v.ClienteId
-            ORDER BY v.Id DESC
-            LIMIT @PageSize OFFSET @Offset";
+            string sql = rol == "ADMIN"
+                ? @"
+                    SELECT v.*,
+                        c.Nombre AS ClienteNombre,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    ORDER BY v.Id DESC
+                    LIMIT @PageSize OFFSET @Offset
+                "
+                : @"
+                    SELECT v.*,
+                        c.Nombre AS ClienteNombre,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    WHERE v.UsuarioId = @UsuarioId
+                    ORDER BY v.Id DESC
+                    LIMIT @PageSize OFFSET @Offset
+                ";
 
             return connection.Query<Venta>(sql, new
             {
+                UsuarioId = usuarioId,
                 PageSize = pageSize,
                 Offset = offset
             });
         }
 
-        public int ObtenerTotal()
+        // 🔹 Obtener total
+        public int ObtenerTotal(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
-            return connection.ExecuteScalar<int>("SELECT COUNT(*) FROM Ventas");
+
+            string sql = rol == "ADMIN"
+                ? "SELECT COUNT(*) FROM Ventas"
+                : "SELECT COUNT(*) FROM Ventas WHERE UsuarioId = @UsuarioId";
+
+            return connection.ExecuteScalar<int>(sql, new
+            {
+                UsuarioId = usuarioId
+            });
         }
-        public List<VentaDTO> ObtenerVentasPaginadas(int pageNumber, int pageSize)
-{
-    using var connection = _context.CreateConnection();
 
-    var offset = (pageNumber - 1) * pageSize;
+        // 🔹 Obtener ventas paginadas DTO
+        public List<VentaDTO> ObtenerVentasPaginadas(
+            int pageNumber,
+            int pageSize,
+            int usuarioId,
+            string rol)
+        {
+            using var connection = _context.CreateConnection();
 
-    var sql = @"
-    SELECT 
-        v.Id,
-        p.Nombre AS Producto,
-        c.Nombre AS Cliente,
-        v.Cantidad,
-        v.Total,
-        v.EsFiado,
-        v.Fecha,
-        IFNULL(v.Pagado,0) AS Pagado,
-        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
-    FROM Ventas v
-    LEFT JOIN Productos p ON p.Id = v.ProductoId
-    LEFT JOIN Clientes c ON c.Id = v.ClienteId
-    ORDER BY v.Id DESC
-    LIMIT @PageSize OFFSET @Offset";
+            var offset = (pageNumber - 1) * pageSize;
 
-    return connection.Query<VentaDTO>(sql, new
-    {
-        PageSize = pageSize,
-        Offset = offset
-    }).ToList();
-}
+            string sql = rol == "ADMIN"
+                ? @"
+                    SELECT
+                        v.Id,
+                        p.Nombre AS Producto,
+                        c.Nombre AS Cliente,
+                        v.Cantidad,
+                        v.Total,
+                        v.EsFiado,
+                        v.Fecha,
+                        IFNULL(v.Pagado,0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Productos p ON p.Id = v.ProductoId
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    ORDER BY v.Id DESC
+                    LIMIT @PageSize OFFSET @Offset
+                "
+                : @"
+                    SELECT
+                        v.Id,
+                        p.Nombre AS Producto,
+                        c.Nombre AS Cliente,
+                        v.Cantidad,
+                        v.Total,
+                        v.EsFiado,
+                        v.Fecha,
+                        IFNULL(v.Pagado,0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                    FROM Ventas v
+                    LEFT JOIN Productos p ON p.Id = v.ProductoId
+                    LEFT JOIN Clientes c ON c.Id = v.ClienteId
+                    WHERE v.UsuarioId = @UsuarioId
+                    ORDER BY v.Id DESC
+                    LIMIT @PageSize OFFSET @Offset
+                ";
+
+            return connection.Query<VentaDTO>(sql, new
+            {
+                UsuarioId = usuarioId,
+                PageSize = pageSize,
+                Offset = offset
+            }).ToList();
+        }
     }
 }

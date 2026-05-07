@@ -8,7 +8,9 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Login - Ferxxito</title>
+
+    <title>Login - Mi Tiendita</title>
+
     <link rel="stylesheet" href="~/css/login.css" />
 </head>
 
@@ -22,17 +24,30 @@
             <img src="~/images/logo-ferxxito1.png" class="logo" />
 
             <h2>Iniciar sesión</h2>
-            <p class="subtitle">Bienvenido de vuelta a Ferxxito</p>
+
+            <p class="subtitle">
+                Bienvenido de vuelta
+            </p>
 
             <form method="post">
 
-                <input type="text" name="Usuario" placeholder="Ingresa tu usuario" class="input" />
+                <input type="text"
+                       name="Usuario"
+                       placeholder="Ingresa tu usuario"
+                       class="input" />
 
-                <input type="password" name="Password" placeholder="Ingresa tu contraseña" class="input" />
+                <input type="password"
+                       name="Password"
+                       placeholder="Ingresa tu contraseña"
+                       class="input" />
 
                 <div class="options">
-                    <label><input type="checkbox" /> Recordarme</label>
-                    
+
+                    <label>
+                        <input type="checkbox" />
+                        Recordarme
+                    </label>
+
                 </div>
 
                 <button type="submit" class="btn-login">
@@ -41,7 +56,20 @@
 
             </form>
 
-            <p class="footer">Ferxxito — Tu tiendita de confianza</p>
+            @if (!string.IsNullOrEmpty(Model.Error))
+            {
+                <div style="
+                    color:red;
+                    margin-top:15px;
+                    font-weight:bold;
+                    text-align:center;">
+                    @Model.Error
+                </div>
+            }
+
+            <p class="footer">
+                Sistema de Tiendita
+            </p>
 
         </div>
 
