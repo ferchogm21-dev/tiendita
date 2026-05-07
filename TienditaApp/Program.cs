@@ -13,6 +13,7 @@ builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<ProductoRepository>();
 builder.Services.AddScoped<VentaRepository>();
 builder.Services.AddScoped<ClienteRepository>();
+builder.Services.AddScoped<UsuarioRepository>();
 
 // =========================
 // RAZOR PAGES

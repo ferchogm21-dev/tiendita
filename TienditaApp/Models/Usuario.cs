@@ -10,6 +10,8 @@ namespace TienditaApp.Models
 
         public string Password { get; set; } = "";
 
-        public string Rol { get; set; } = "";
+        public string Rol { get; set; } = "USER";
+
+        public string NombreNegocio { get; set; } = "";
     }
 }

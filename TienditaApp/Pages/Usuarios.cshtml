@@ -1,0 +1,159 @@
+@page
+@model TienditaApp.Pages.UsuariosModel
+
+<h1>👑 Usuarios</h1>
+
+<h3>
+    🏪 @Model.Negocio
+</h3>
+
+<hr />
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Mensaje"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<form method="post">
+
+    <input type="hidden" asp-for="Usuario.Id" />
+
+    <div style="margin-bottom:10px;">
+
+        <label>Nombre</label>
+
+        <input asp-for="Usuario.Nombre"
+               class="form-control" />
+
+    </div>
+
+    <div style="margin-bottom:10px;">
+
+        <label>Usuario</label>
+
+        <input asp-for="Usuario.UsuarioNombre"
+               class="form-control" />
+
+    </div>
+
+    <div style="margin-bottom:10px;">
+
+        <label>Password</label>
+
+        <input asp-for="Usuario.Password"
+               class="form-control"
+               type="password" />
+
+    </div>
+
+    <div style="margin-bottom:10px;">
+
+        <label>Rol</label>
+
+        <select asp-for="Usuario.Rol"
+                class="form-control">
+
+            <option value="USER">USER</option>
+
+            <option value="ADMIN">ADMIN</option>
+
+        </select>
+
+    </div>
+
+    <div style="margin-bottom:20px;">
+
+        <label>Nombre Negocio</label>
+
+        <input asp-for="Usuario.NombreNegocio"
+               class="form-control" />
+
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+
+        💾 Guardar Usuario
+
+    </button>
+
+</form>
+
+<hr />
+
+<table class="table table-bordered">
+
+    <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Negocio</th>
+            <th>Acciones</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var u in Model.ListaUsuarios)
+        {
+            <tr>
+
+                <td>@u.Id</td>
+
+                <td>@u.Nombre</td>
+
+                <td>@u.UsuarioNombre</td>
+
+                <td>@u.Rol</td>
+
+                <td>@u.NombreNegocio</td>
+
+                <td>
+
+                    <a asp-page="Usuarios"
+                       asp-page-handler="Editar"
+                       asp-route-id="@u.Id"
+                       class="btn btn-warning btn-sm">
+
+                        ✏️ Editar
+
+                    </a>
+
+                    @if (u.Id != 1)
+                    {
+                        <form method="post"
+                              asp-page-handler="Eliminar"
+                              asp-route-id="@u.Id"
+                              style="display:inline;">
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm">
+
+                                🗑️ Eliminar
+
+                            </button>
+
+                        </form>
+                    }
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
