@@ -1,5 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
+   <style>
+
+.dropdown-item:hover {
+    background: #f8f9fa;
+}
+
+</style> 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,58 +27,110 @@
     @if (!esLogin)
     {
         <header>
-            <nav style="background:#0d6efd; padding:15px; display:flex; align-items:center; gap:20px;">
 
-                <span style="color:white; font-weight:bold;">
-                    <h3>
-                      🏪 @Context.Session.GetString("Negocio")
-                    </h3>
-                </span>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
 
-                <a href="/Index" style="color:white; text-decoration:none;">Inicio</a>
-                <a href="/Productos" style="color:white; text-decoration:none;">Productos</a>
-                <a href="/Clientes" style="color:white; text-decoration:none;">Clientes</a>
-                <a href="/Ventas" style="color:white; text-decoration:none;">Ventas</a>
-                <a href="/Pagos" style="color:white; text-decoration:none;">Pagos</a>
+        <div class="container-fluid">
 
-                <!-- 🔥 USUARIO + DROPDOWN -->
-                <div style="margin-left:auto; position:relative;">
-                    <button onclick="toggleMenu()" style="
-                        background:transparent;
-                        border:none;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    ">
-                        👤 @usuario ▼
+            <!-- LOGO -->
+            <a class="navbar-brand fw-bold"
+               href="/Index">
+
+                🏪 @Context.Session.GetString("Negocio")
+
+            </a>
+
+            <!-- BOTON MOVIL -->
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#menuNavbar">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+            <!-- CONTENIDO -->
+            <div class="collapse navbar-collapse"
+                 id="menuNavbar">
+
+                <!-- LINKS -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Index">
+                            Inicio
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Productos">
+                            Productos
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Clientes">
+                            Clientes
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Ventas">
+                            Ventas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Pagos">
+                            Pagos
+                        </a>
+                    </li>
+
+                </ul>
+
+                <!-- DROPDOWN USUARIO -->
+                <div class="dropdown mt-3 mt-lg-0">
+
+                    <button class="btn btn-outline-light dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown">
+
+                        👤 @usuario
+
                     </button>
 
-                    <div id="menuUsuario" style="
-                        display:none;
-                        position:absolute;
-                        right:0;
-                        background:white;
-                        border-radius:8px;
-                        box-shadow:0 4px 10px rgba(0,0,0,0.2);
-                        margin-top:10px;
-                        min-width:150px;
-                    ">
-                        <form method="post" asp-page="/Login" asp-page-handler="Logout">
-                        <button type="submit" style="
-                            width:100%;
-                            padding:10px;
-                            border:none;
-                            background:none;
-                            text-align:left;
-                            cursor:pointer;
-                        ">🔒 Cerrar sesión
-                        </button>
-                    </form>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-lg-end">
+
+                        <li>
+
+                            <form method="post"
+                                asp-page="/Login"
+                                asp-page-handler="Logout"
+                                class="m-0 p-0">
+
+                                <button type="submit"
+                                        class="dropdown-item w-100">
+
+                                    🔒 Cerrar sesión
+
+                                </button>
+
+                            </form>
+
+                        </li>
+
+                    </ul>
+
                 </div>
 
-            </nav>
-        </header>
+            </div>
+
+        </div>
+
+    </nav>
+
+</header>
     }
 
     <div class="container">
