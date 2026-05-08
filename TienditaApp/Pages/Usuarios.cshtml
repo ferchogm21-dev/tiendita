@@ -78,6 +78,14 @@
                class="form-control" />
 
     </div>
+    <div style="margin-bottom:20px;">
+
+        <label>Número de Cuenta</label>
+
+        <input asp-for="Usuario.NumeroCuenta"
+            class="form-control" />
+
+    </div>
 
     <button type="submit"
             class="btn btn-primary">
@@ -100,6 +108,7 @@
             <th>Usuario</th>
             <th>Rol</th>
             <th>Negocio</th>
+            <th>Cuenta</th>
             <th>Acciones</th>
         </tr>
 
@@ -120,6 +129,8 @@
                 <td>@u.Rol</td>
 
                 <td>@u.NombreNegocio</td>
+
+                <td>@u.NumeroCuenta</td>
 
                 <td>
 

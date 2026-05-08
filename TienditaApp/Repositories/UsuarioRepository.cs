@@ -25,7 +25,8 @@ namespace TienditaApp.Repositories
                     Usuario AS UsuarioNombre,
                     Password,
                     Rol,
-                    NombreNegocio
+                    NombreNegocio,
+                    NumeroCuenta
                 FROM Usuarios
                 ORDER BY Id DESC
             ";
@@ -45,7 +46,8 @@ namespace TienditaApp.Repositories
                     Usuario AS UsuarioNombre,
                     Password,
                     Rol,
-                    NombreNegocio
+                    NombreNegocio,
+                    NumeroCuenta
                 FROM Usuarios
                 WHERE Id = @Id
             ";
@@ -67,7 +69,8 @@ namespace TienditaApp.Repositories
                     Usuario,
                     Password,
                     Rol,
-                    NombreNegocio
+                    NombreNegocio,
+                    NumeroCuenta
                 )
                 VALUES
                 (
@@ -75,7 +78,8 @@ namespace TienditaApp.Repositories
                     @UsuarioNombre,
                     @Password,
                     @Rol,
-                    @NombreNegocio
+                    @NombreNegocio,
+                    @NumeroCuenta
                 )
             ";
 
@@ -94,7 +98,8 @@ namespace TienditaApp.Repositories
                     Usuario = @UsuarioNombre,
                     Password = @Password,
                     Rol = @Rol,
-                    NombreNegocio = @NombreNegocio
+                    NombreNegocio = @NombreNegocio,
+                    NumeroCuenta = @NumeroCuenta
                 WHERE Id = @Id
             ";
 

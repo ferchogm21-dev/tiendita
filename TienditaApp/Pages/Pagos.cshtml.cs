@@ -527,8 +527,9 @@ namespace TienditaApp.Pages
 
             var mensaje = $"---- {HttpContext.Session.GetString("Negocio")} ----%0A";
             mensaje += "--------------------%0A";
-            mensaje += $"Hola {nombre}%0A";
-            mensaje += "Te comparto el detalle de tus compras:%0A%0A";
+            mensaje += $"Cuenta: {HttpContext.Session.GetString("NumeroCuenta")}%0A%0A%0A";
+            mensaje += $"Hola, {nombre}%0A";
+            mensaje += "Te comparto el detalle de tu deuda :):%0A%0A";
 
             decimal total = 0;
 

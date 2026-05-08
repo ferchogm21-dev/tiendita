@@ -40,7 +40,8 @@ namespace TienditaApp.Pages
                     Id,
                     Nombre,
                     Rol,
-                    NombreNegocio
+                    NombreNegocio,
+                    NumeroCuenta
                 FROM Usuarios
                 WHERE Usuario = $user
                 AND Password = $pass
@@ -92,6 +93,13 @@ namespace TienditaApp.Pages
                 HttpContext.Session.SetString(
                     "Negocio",
                     negocio);
+                string cuenta = reader.IsDBNull(4)
+                ? ""
+                : reader.GetString(4);
+
+                HttpContext.Session.SetString(
+                    "NumeroCuenta",
+                    cuenta);
 
                 return RedirectToPage("/Index");
             }
