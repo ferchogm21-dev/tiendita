@@ -29,4 +29,6 @@ public class Venta
     public decimal Saldo => Total - (Pagado ?? 0);
 
     public string? ProductoNombre { get; set; }
+
+    
 }

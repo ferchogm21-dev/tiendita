@@ -19,5 +19,9 @@ namespace TienditaApp.Models
         public decimal Pagado { get; set; }
 
         public decimal Saldo { get; set; }
+
+        public int ProductoId { get; set; }
+
+        public int ClienteId { get; set; }
     }
 }

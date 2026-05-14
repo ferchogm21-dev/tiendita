@@ -145,27 +145,38 @@
 
                     <td>
 
-                        <!-- EDITAR -->
-                        <a asp-page="Clientes"
-                           asp-page-handler="Editar"
-                           asp-route-id="@item.Id"
-                           class="btn btn-primary btn-sm">
+                        <div class="d-flex justify-content-center gap-2">
 
-                            ✏️ Editar
-                        </a>
+                            <!-- ✏️ EDITAR -->
+                            <a asp-page="Clientes"
+                            asp-page-handler="Editar"
+                            asp-route-id="@item.Id"
+                            class="btn btn-primary btn-sm">
 
-                        <!-- ELIMINAR -->
-                        <form method="post"
-                              style="display:inline;">
+                                ✏️ Editar
 
-                            <button type="submit"
-                                    formaction="?handler=Eliminar&id=@item.Id"
-                                    class="btn btn-danger btn-sm">
+                            </a>
 
-                                🗑 Eliminar
-                            </button>
+                            <!-- 🗑 ELIMINAR -->
+                            <form method="post"
+                                asp-page-handler="Eliminar"
+                                onsubmit="return confirm('¿Seguro que deseas eliminar a @item.Nombre?')"
+                                style="margin:0;">
 
-                        </form>
+                                <input type="hidden"
+                                    name="id"
+                                    value="@item.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm">
+
+                                    🗑 Eliminar
+
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     </td>
 

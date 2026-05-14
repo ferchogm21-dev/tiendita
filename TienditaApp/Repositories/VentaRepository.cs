@@ -1,6 +1,5 @@
 using Dapper;
 using TienditaApp.Data;
-using TienditaApp.Migrations;
 using TienditaApp.Models;
 
 namespace TienditaApp.Repositories
@@ -14,7 +13,9 @@ namespace TienditaApp.Repositories
             _context = context;
         }
 
-        // 🔹 Registrar venta
+        // =====================================================
+        // 🔹 REGISTRAR VENTA
+        // =====================================================
         public void RegistrarVenta(Venta venta)
         {
             using var connection = _context.CreateConnection();
@@ -90,7 +91,145 @@ namespace TienditaApp.Repositories
             });
         }
 
-        // 🔹 Obtener ventas
+        // =====================================================
+        // 🔹 OBTENER VENTA POR ID
+        // =====================================================
+        public Venta ObtenerPorId(int id)
+        {
+            using var connection = _context.CreateConnection();
+
+            return connection.QueryFirstOrDefault<Venta>(
+                @"SELECT *
+                  FROM Ventas
+                  WHERE Id = @Id",
+                new { Id = id });
+        }
+
+        // =====================================================
+        // 🔹 ACTUALIZAR VENTA
+        // =====================================================
+        public void ActualizarVenta(Venta ventaNueva)
+        {
+            using var connection = _context.CreateConnection();
+
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                // 🔥 Obtener venta anterior
+                var ventaAnterior =
+                    connection.QueryFirstOrDefault<Venta>(
+                        @"SELECT *
+                          FROM Ventas
+                          WHERE Id = @Id",
+                        new { ventaNueva.Id },
+                        transaction);
+
+                if (ventaAnterior == null)
+                    throw new Exception("La venta no existe");
+
+                // =========================================
+                // 🔥 DEVOLVER STOCK DEL PRODUCTO ANTERIOR
+                // =========================================
+                connection.Execute(@"
+                    UPDATE Productos
+                    SET Stock = Stock + @Cantidad
+                    WHERE Id = @ProductoId",
+                    new
+                    {
+                        Cantidad = ventaAnterior.Cantidad,
+                        ProductoId = ventaAnterior.ProductoId
+                    },
+                    transaction);
+
+                // =========================================
+                // 🔥 OBTENER NUEVO PRODUCTO
+                // =========================================
+                var productoNuevo =
+                    connection.QueryFirstOrDefault<Producto>(
+                        @"SELECT *
+                          FROM Productos
+                          WHERE Id = @Id
+                          AND UsuarioId = @UsuarioId",
+                        new
+                        {
+                            Id = ventaNueva.ProductoId,
+                            UsuarioId = ventaNueva.UsuarioId
+                        },
+                        transaction);
+
+                if (productoNuevo == null)
+                    throw new Exception("Producto no encontrado");
+
+                // =========================================
+                // 🔥 VALIDAR STOCK
+                // =========================================
+                if (productoNuevo.Stock < ventaNueva.Cantidad)
+                    throw new Exception("Stock insuficiente");
+
+                // =========================================
+                // 🔥 RECALCULAR TOTAL
+                // =========================================
+                ventaNueva.Total =
+                    productoNuevo.Precio * ventaNueva.Cantidad;
+
+                // =========================================
+                // 🔥 MANEJO FIADO
+                // =========================================
+                if (ventaNueva.EsFiado)
+                {
+                    if (ventaNueva.Pagado > ventaNueva.Total)
+                        ventaNueva.Pagado = ventaNueva.Total;
+                }
+                else
+                {
+                    ventaNueva.Pagado = ventaNueva.Total;
+                }
+
+                // =========================================
+                // 🔥 DESCONTAR NUEVO STOCK
+                // =========================================
+                connection.Execute(@"
+                    UPDATE Productos
+                    SET Stock = Stock - @Cantidad
+                    WHERE Id = @ProductoId",
+                    new
+                    {
+                        Cantidad = ventaNueva.Cantidad,
+                        ProductoId = ventaNueva.ProductoId
+                    },
+                    transaction);
+
+                // =========================================
+                // 🔥 ACTUALIZAR VENTA
+                // =========================================
+                connection.Execute(@"
+                    UPDATE Ventas
+                    SET
+                        ProductoId = @ProductoId,
+                        ClienteId = @ClienteId,
+                        Cantidad = @Cantidad,
+                        Total = @Total,
+                        EsFiado = @EsFiado,
+                        Pagado = @Pagado
+                    WHERE Id = @Id",
+                    ventaNueva,
+                    transaction);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        // =====================================================
+        // 🔹 OBTENER VENTAS
+        // =====================================================
         public List<VentaDTO> ObtenerVentas(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
@@ -99,14 +238,16 @@ namespace TienditaApp.Repositories
                 ? @"
                     SELECT
                         v.Id,
+                        v.ProductoId,
+                        v.ClienteId,
                         p.Nombre AS Producto,
                         c.Nombre AS Cliente,
                         v.Cantidad,
                         v.Total,
                         v.EsFiado,
                         v.Fecha,
-                        IFNULL(v.Pagado,0) AS Pagado,
-                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                        IFNULL(v.Pagado,0.0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0.0)) AS Saldo
                     FROM Ventas v
                     LEFT JOIN Productos p ON p.Id = v.ProductoId
                     LEFT JOIN Clientes c ON c.Id = v.ClienteId
@@ -115,14 +256,16 @@ namespace TienditaApp.Repositories
                 : @"
                     SELECT
                         v.Id,
+                        v.ProductoId,
+                        v.ClienteId,
                         p.Nombre AS Producto,
                         c.Nombre AS Cliente,
                         v.Cantidad,
                         v.Total,
                         v.EsFiado,
                         v.Fecha,
-                        IFNULL(v.Pagado,0) AS Pagado,
-                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                        IFNULL(v.Pagado,0.0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0.0)) AS Saldo
                     FROM Ventas v
                     LEFT JOIN Productos p ON p.Id = v.ProductoId
                     LEFT JOIN Clientes c ON c.Id = v.ClienteId
@@ -136,7 +279,9 @@ namespace TienditaApp.Repositories
             }).ToList();
         }
 
-        // 🔹 Obtener deudas
+        // =====================================================
+        // 🔹 OBTENER DEUDAS
+        // =====================================================
         public List<ClienteDeuda> ObtenerDeudas(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
@@ -172,7 +317,9 @@ namespace TienditaApp.Repositories
             }).ToList();
         }
 
-        // 🔹 Obtener paginados
+        // =====================================================
+        // 🔹 OBTENER PAGINADOS
+        // =====================================================
         public IEnumerable<Venta> ObtenerPaginados(
             int pageNumber,
             int pageSize,
@@ -187,7 +334,7 @@ namespace TienditaApp.Repositories
                 ? @"
                     SELECT v.*,
                         c.Nombre AS ClienteNombre,
-                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                        (v.Total - IFNULL(v.Pagado,0.0)) AS Saldo
                     FROM Ventas v
                     LEFT JOIN Clientes c ON c.Id = v.ClienteId
                     ORDER BY v.Id DESC
@@ -212,7 +359,9 @@ namespace TienditaApp.Repositories
             });
         }
 
-        // 🔹 Obtener total
+        // =====================================================
+        // 🔹 OBTENER TOTAL
+        // =====================================================
         public int ObtenerTotal(int usuarioId, string rol)
         {
             using var connection = _context.CreateConnection();
@@ -227,7 +376,9 @@ namespace TienditaApp.Repositories
             });
         }
 
-        // 🔹 Obtener ventas paginadas DTO
+        // =====================================================
+        // 🔹 OBTENER VENTAS PAGINADAS DTO
+        // =====================================================
         public List<VentaDTO> ObtenerVentasPaginadas(
             int pageNumber,
             int pageSize,
@@ -242,14 +393,16 @@ namespace TienditaApp.Repositories
                 ? @"
                     SELECT
                         v.Id,
+                        v.ProductoId,
+                        v.ClienteId,
                         p.Nombre AS Producto,
                         c.Nombre AS Cliente,
                         v.Cantidad,
                         v.Total,
                         v.EsFiado,
                         v.Fecha,
-                        IFNULL(v.Pagado,0) AS Pagado,
-                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                        IFNULL(v.Pagado,0.0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0.0)) AS Saldo
                     FROM Ventas v
                     LEFT JOIN Productos p ON p.Id = v.ProductoId
                     LEFT JOIN Clientes c ON c.Id = v.ClienteId
@@ -259,14 +412,16 @@ namespace TienditaApp.Repositories
                 : @"
                     SELECT
                         v.Id,
+                        v.ProductoId,
+                        v.ClienteId,
                         p.Nombre AS Producto,
                         c.Nombre AS Cliente,
                         v.Cantidad,
                         v.Total,
                         v.EsFiado,
                         v.Fecha,
-                        IFNULL(v.Pagado,0) AS Pagado,
-                        (v.Total - IFNULL(v.Pagado,0)) AS Saldo
+                        IFNULL(v.Pagado,0.0) AS Pagado,
+                        (v.Total - IFNULL(v.Pagado,0.0)) AS Saldo
                     FROM Ventas v
                     LEFT JOIN Productos p ON p.Id = v.ProductoId
                     LEFT JOIN Clientes c ON c.Id = v.ClienteId

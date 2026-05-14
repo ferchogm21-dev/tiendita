@@ -6,12 +6,20 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
+
     <meta charset="utf-8" />
+
+    <!-- 🔥 RESPONSIVE -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
     <title>Login - Mi Tiendita</title>
 
-    <link rel="stylesheet" href="~/css/login.css" />
+    <link rel="stylesheet"
+          href="~/css/login.css" />
+
 </head>
 
 <body class="login-body">
@@ -21,7 +29,8 @@
         <div class="login-card">
 
             <!-- LOGO -->
-            <img src="~/images/logo-ferxxito1.png" class="logo" />
+            <img src="~/images/logo-ferxxito1.png"
+                 class="logo" />
 
             <h2>Iniciar sesión</h2>
 
@@ -31,42 +40,52 @@
 
             <form method="post">
 
+                <!-- USUARIO -->
                 <input type="text"
                        name="Usuario"
                        placeholder="Ingresa tu usuario"
                        class="input" />
 
+                <!-- PASSWORD -->
                 <input type="password"
                        name="Password"
                        placeholder="Ingresa tu contraseña"
                        class="input" />
 
+                <!-- OPCIONES -->
                 <div class="options">
 
                     <label>
+
                         <input type="checkbox" />
+
                         Recordarme
+
                     </label>
 
                 </div>
 
-                <button type="submit" class="btn-login">
+                <!-- BOTON -->
+                <button type="submit"
+                        class="btn-login">
+
                     Iniciar sesión
+
                 </button>
 
             </form>
 
+            <!-- ERROR -->
             @if (!string.IsNullOrEmpty(Model.Error))
             {
-                <div style="
-                    color:red;
-                    margin-top:15px;
-                    font-weight:bold;
-                    text-align:center;">
+                <div class="error">
+
                     @Model.Error
+
                 </div>
             }
 
+            <!-- FOOTER -->
             <p class="footer">
                 Sistema de Tiendita
             </p>
@@ -76,4 +95,5 @@
     </div>
 
 </body>
+
 </html>

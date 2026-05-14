@@ -1,5 +1,6 @@
 @page
 @model VentasModel
+
 <style>
 
 /* TIPO DE VENTA */
@@ -65,6 +66,7 @@
 }
 
 </style>
+
 <h1 class="mb-4">🧾 Ventas</h1>
 
 <!-- CARD -->
@@ -73,7 +75,13 @@
     <div class="card-body">
 
         <form method="post"
+              id="formVenta"
               onsubmit="return validarVenta()">
+
+            <!-- 🔥 ID OCULTO -->
+            <input type="hidden"
+                   asp-for="Venta.Id"
+                   id="Venta_Id" />
 
             <div class="row g-3">
 
@@ -166,9 +174,10 @@
                         <label>
 
                             <input type="radio"
-                                name="Venta.EsFiado"
-                                value="false"
-                                checked />
+                                   id="contadoRadio"
+                                   name="Venta.EsFiado"
+                                   value="false"
+                                   checked />
 
                             💵 Contado
 
@@ -178,8 +187,9 @@
                         <label>
 
                             <input type="radio"
-                                name="Venta.EsFiado"
-                                value="true" />
+                                   id="fiadoRadio"
+                                   name="Venta.EsFiado"
+                                   value="true" />
 
                             🧾 Fiado
 
@@ -223,6 +233,7 @@
                         class="btn btn-success btn-lg">
 
                     💰 Vender
+
                 </button>
 
             </div>
@@ -253,6 +264,7 @@
                         <th>Tipo</th>
                         <th>Fecha</th>
                         <th>Total</th>
+                        <th>Acciones</th>
                     </tr>
 
                 </thead>
@@ -292,6 +304,25 @@
 
                             <td class="fw-bold">
                                 $@v.Total
+                            </td>
+
+                            <!-- 🔥 EDITAR -->
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-warning btn-sm"
+                                        onclick="editarVenta(
+                                            @v.Id,
+                                            @v.ProductoId,
+                                            @v.ClienteId,
+                                            @v.Cantidad,
+                                            '@v.EsFiado'
+                                        )">
+
+                                    ✏️ Editar
+
+                                </button>
+
                             </td>
 
                         </tr>
@@ -460,7 +491,55 @@ function validarVenta() {
     return true;
 }
 
+// 🔥 EDITAR VENTA
+function editarVenta(
+    id,
+    productoId,
+    clienteId,
+    cantidad,
+    esFiado)
+{
+    document.getElementById("Venta_Id").value = id;
+
+    productoSelect.value = productoId;
+
+    document.getElementById("clienteSelect").value =
+        clienteId;
+
+    cantidadInput.value = cantidad;
+
+    // 🔥 Tipo venta
+    if (esFiado === 'True') {
+
+        document.getElementById("fiadoRadio").checked = true;
+
+    } else {
+
+        document.getElementById("contadoRadio").checked = true;
+    }
+
+    // 🔥 Cambiar acción del form
+    document.getElementById("formVenta")
+        .setAttribute("action", "?handler=Editar");
+
+    // 🔥 Cambiar botón
+    boton.innerHTML = "✏️ Actualizar Venta";
+
+    boton.classList.remove("btn-success");
+
+    boton.classList.add("btn-warning");
+
+    actualizarInfo();
+
+    // 🔥 Scroll arriba
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
 productoSelect.addEventListener("change", actualizarInfo);
+
 cantidadInput.addEventListener("input", actualizarInfo);
 
 </script>

@@ -2374,11 +2374,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj",
+      "projectUniqueName": "C:\\Users\\Atencion a clientes\\Documents\\tiendita\\TienditaApp\\TienditaApp.csproj",
       "projectName": "TienditaApp",
-      "projectPath": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj",
+      "projectPath": "C:\\Users\\Atencion a clientes\\Documents\\tiendita\\TienditaApp\\TienditaApp.csproj",
       "packagesPath": "C:\\Users\\Atencion a clientes\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\obj\\",
+      "outputPath": "C:\\Users\\Atencion a clientes\\Documents\\tiendita\\TienditaApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Atencion a clientes\\AppData\\Roaming\\NuGet\\NuGet.Config"

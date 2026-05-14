@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TienditaApp.Models;
-using TienditaApp.Data;
-using System.Linq;
 using TienditaApp.Repositories;
 
 public class VentasModel : PageModel
@@ -36,9 +34,9 @@ public class VentasModel : PageModel
 
     public int TotalPages { get; set; }
 
-    // =========================
+    // =====================================================
     // 🔹 MÉTODO REUTILIZABLE
-    // =========================
+    // =====================================================
     private void CargarDatos(int pageNumber)
     {
         int usuarioId =
@@ -51,7 +49,7 @@ public class VentasModel : PageModel
 
         PageNumber = pageNumber;
 
-        // 🔥 PAGINACIÓN REAL
+        // 🔥 PAGINACIÓN
         ListaVentas = _ventaRepo
             .ObtenerVentasPaginadas(
                 PageNumber,
@@ -65,20 +63,61 @@ public class VentasModel : PageModel
         TotalPages =
             (int)Math.Ceiling(total / (double)pageSize);
 
-        // 🔥 SOLO PRODUCTOS DEL USUARIO
+        // 🔥 PRODUCTOS
         Productos = _productoRepo
             .ObtenerTodos(usuarioId, rol)
             .ToList();
 
-        // 🔥 SOLO CLIENTES DEL USUARIO
+        // 🔥 CLIENTES
         Clientes = _clienteRepo
             .ObtenerClientes(usuarioId, rol)
             .ToList();
     }
 
-    // =========================
+    // =====================================================
+    // 🔹 VALIDACIONES
+    // =====================================================
+    private bool ValidarVenta(int pageNumber)
+    {
+        if (Venta.ProductoId == 0)
+        {
+            ModelState.AddModelError(
+                "",
+                "Selecciona un producto");
+
+            CargarDatos(pageNumber);
+
+            return false;
+        }
+
+        if (Venta.ClienteId == 0)
+        {
+            ModelState.AddModelError(
+                "",
+                "Selecciona un cliente");
+
+            CargarDatos(pageNumber);
+
+            return false;
+        }
+
+        if (Venta.Cantidad <= 0)
+        {
+            ModelState.AddModelError(
+                "",
+                "La cantidad debe ser mayor a 0");
+
+            CargarDatos(pageNumber);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // =====================================================
     // 🔹 GET
-    // =========================
+    // =====================================================
     public IActionResult OnGet(int pageNumber = 1)
     {
         if (HttpContext.Session.GetString("Usuario") == null)
@@ -91,9 +130,9 @@ public class VentasModel : PageModel
         return Page();
     }
 
-    // =========================
-    // 🔹 POST
-    // =========================
+    // =====================================================
+    // 🔹 REGISTRAR VENTA
+    // =====================================================
     public IActionResult OnPost(int pageNumber = 1)
     {
         if (HttpContext.Session.GetString("Usuario") == null)
@@ -101,26 +140,8 @@ public class VentasModel : PageModel
             return RedirectToPage("/Login");
         }
 
-        // 🔥 VALIDACIONES
-        if (Venta.ProductoId == 0)
+        if (!ValidarVenta(pageNumber))
         {
-            ModelState.AddModelError(
-                "",
-                "Selecciona un producto");
-
-            CargarDatos(pageNumber);
-
-            return Page();
-        }
-
-        if (Venta.ClienteId == 0)
-        {
-            ModelState.AddModelError(
-                "",
-                "Selecciona un cliente");
-
-            CargarDatos(pageNumber);
-
             return Page();
         }
 
@@ -130,11 +151,59 @@ public class VentasModel : PageModel
 
         try
         {
-            // ✅ Registrar venta
             _ventaRepo.RegistrarVenta(Venta);
 
             TempData["Mensaje"] =
                 "Venta registrada correctamente ✅";
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+
+            CargarDatos(pageNumber);
+
+            return Page();
+        }
+
+        return RedirectToPage(new { pageNumber });
+    }
+
+    // =====================================================
+    // 🔹 EDITAR VENTA
+    // =====================================================
+    public IActionResult OnPostEditar(int pageNumber = 1)
+    {
+        if (HttpContext.Session.GetString("Usuario") == null)
+        {
+            return RedirectToPage("/Login");
+        }
+
+        if (Venta.Id <= 0)
+        {
+            ModelState.AddModelError(
+                "",
+                "Venta inválida");
+
+            CargarDatos(pageNumber);
+
+            return Page();
+        }
+
+        if (!ValidarVenta(pageNumber))
+        {
+            return Page();
+        }
+
+        // 🔥 ASIGNAR USUARIO
+        Venta.UsuarioId =
+            HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+
+        try
+        {
+            _ventaRepo.ActualizarVenta(Venta);
+
+            TempData["Mensaje"] =
+                "Venta actualizada correctamente ✅";
         }
         catch (Exception ex)
         {

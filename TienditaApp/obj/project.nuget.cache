@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Gh8dfLOr9sc=",
+  "dgSpecHash": "kl2Qw7+vtzE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Atencion a clientes\\tiendita\\TienditaApp\\TienditaApp.csproj",
+  "projectFilePath": "C:\\Users\\Atencion a clientes\\Documents\\tiendita\\TienditaApp\\TienditaApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Atencion a clientes\\.nuget\\packages\\dapper\\2.1.72\\dapper.2.1.72.nupkg.sha512",
     "C:\\Users\\Atencion a clientes\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
