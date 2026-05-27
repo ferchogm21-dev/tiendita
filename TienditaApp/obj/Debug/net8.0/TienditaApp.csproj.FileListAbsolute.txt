@@ -546,3 +546,8 @@ C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\obj\Debug\net8.0\ref
 C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\obj\Debug\net8.0\TienditaApp.pdb
 C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\obj\Debug\net8.0\TienditaApp.genruntimeconfig.cache
 C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\obj\Debug\net8.0\ref\TienditaApp.dll
+C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\bin\Debug\net8.0\publish\web.config
+C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\bin\Debug\net8.0\publish\TienditaApp.deps.json
+C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp\bin\Debug\net8.0\publish\TienditaApp.runtimeconfig.json

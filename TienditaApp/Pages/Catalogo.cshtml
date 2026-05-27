@@ -1,0 +1,65 @@
+@page "/tienda/{Nombrenegocio}"
+@model TienditaApp.Pages.CatalogoModel
+
+@{
+    ViewData["Title"] = "Catálogo";
+}
+<h1 class="text-center mb-4">
+    🏪 @Model.Productos.FirstOrDefault()?.NombreNegocio
+</h1>
+<div class="container mt-4">
+
+    <h1 class="text-center mb-4">
+        🛒 Catálogo
+    </h1>
+
+    <div class="row">
+
+        @foreach (var p in Model.Productos)
+        {
+            var mensaje =
+$@"Hola 👋
+
+Quiero pedir:
+
+🛒 Producto: {p.Nombre}
+💲 Precio: ${p.Precio}";
+
+            var whatsapp =
+                $"https://wa.me/{p.WhatsApp}?text={Uri.EscapeDataString(mensaje)}";
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow border-0 rounded-4 h-100">
+
+                    <div class="card-body text-center">
+
+                        <h4>@p.Nombre</h4>
+
+                        <h5 class="text-success">
+                            $@p.Precio
+                        </h5>
+
+                        <p>
+                            Disponibles:
+                            <strong>@p.Stock</strong>
+                        </p>
+
+                        <a href="@whatsapp"
+                           target="_blank"
+                           class="btn btn-success rounded-pill w-100">
+
+                            📲 Pedir por WhatsApp
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

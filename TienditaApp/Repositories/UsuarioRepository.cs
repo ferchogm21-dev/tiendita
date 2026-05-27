@@ -26,7 +26,8 @@ namespace TienditaApp.Repositories
                     Password,
                     Rol,
                     NombreNegocio,
-                    NumeroCuenta
+                    NumeroCuenta,
+                    WhatsApp
                 FROM Usuarios
                 ORDER BY Id DESC
             ";
@@ -70,7 +71,8 @@ namespace TienditaApp.Repositories
                     Password,
                     Rol,
                     NombreNegocio,
-                    NumeroCuenta
+                    NumeroCuenta,
+                    WhatsApp
                 )
                 VALUES
                 (
@@ -79,7 +81,8 @@ namespace TienditaApp.Repositories
                     @Password,
                     @Rol,
                     @NombreNegocio,
-                    @NumeroCuenta
+                    @NumeroCuenta,
+                    @WhatsApp
                 )
             ";
 
@@ -99,7 +102,8 @@ namespace TienditaApp.Repositories
                     Password = @Password,
                     Rol = @Rol,
                     NombreNegocio = @NombreNegocio,
-                    NumeroCuenta = @NumeroCuenta
+                    NumeroCuenta = @NumeroCuenta,
+                    WhatsApp = @WhatsApp
                 WHERE Id = @Id
             ";
 

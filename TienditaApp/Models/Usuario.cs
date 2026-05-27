@@ -15,5 +15,7 @@ namespace TienditaApp.Models
         public string NombreNegocio { get; set; } = "";
 
         public string NumeroCuenta { get; set; } = "";
+
+        public string WhatsApp { get; set; } = "";
     }
 }

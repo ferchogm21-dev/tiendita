@@ -86,6 +86,15 @@
             class="form-control" />
 
     </div>
+    <div style="margin-bottom:20px;">
+
+                    <label>WhatsApp</label>
+
+                    <input asp-for="Usuario.WhatsApp"
+                        class="form-control"
+                        placeholder="5212221234567" />
+
+                </div>
 
     <button type="submit"
             class="btn btn-primary">
@@ -109,6 +118,7 @@
             <th>Rol</th>
             <th>Negocio</th>
             <th>Cuenta</th>
+            <th>WhatsApp</th>
             <th>Acciones</th>
         </tr>
 
@@ -131,6 +141,10 @@
                 <td>@u.NombreNegocio</td>
 
                 <td>@u.NumeroCuenta</td>
+
+                <td>@u.WhatsApp</td>
+
+                
 
                 <td>
 

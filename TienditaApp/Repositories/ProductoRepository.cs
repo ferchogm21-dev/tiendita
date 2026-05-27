@@ -140,4 +140,34 @@ public class ProductoRepository
             UsuarioId = usuarioId
         });
     }
+    // 🔹 Obtener productos disponibles para catálogo público
+    // 🔹 Obtener productos públicos por tienda
+        public List<CatalogoDTO> ObtenerCatalogoPorSlug(
+                string nombrenegocio)
+            {
+                using var connection = _context.CreateConnection();
+
+                string sql = @"
+                    SELECT
+                        p.Id,
+                        p.Nombre,
+                        p.Precio,
+                        p.Stock,
+                        u.WhatsApp,
+                        u.NombreNegocio
+                    FROM Productos p
+                    INNER JOIN Usuarios u
+                        ON u.Id = p.UsuarioId
+                    WHERE u.NombreNegocio = @NombreNegocio
+                    AND p.Stock > 0
+                    ORDER BY p.Nombre
+                ";
+
+                return connection.Query<CatalogoDTO>(
+                    sql,
+                    new
+                    {
+                        NombreNegocio = nombrenegocio
+                    }).ToList();
+            }
 }
