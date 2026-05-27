@@ -18,6 +18,10 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\Atencion a clientes\Documents\tiendita\TienditaApp
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/Atencion a clientes/Documents/tiendita/TienditaApp/Pages/Catalogo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0YWxvZ28uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Atencion a clientes/Documents/tiendita/TienditaApp/Pages/Clientes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50ZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

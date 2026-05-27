@@ -2,10 +2,10 @@
 @model TienditaApp.Pages.CatalogoModel
 
 @{
-    ViewData["Title"] = "Catálogo";
+    Layout = "_CatalogoLayout";
 }
 <h1 class="text-center mb-4">
-    🏪 @Model.Productos.FirstOrDefault()?.NombreNegocio
+    🏪 @ViewData["Negocio"]
 </h1>
 <div class="container mt-4">
 

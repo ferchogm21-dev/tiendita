@@ -107,14 +107,14 @@ public class ProductosModel : PageModel
         {
             _productoRepo.Agregar(Producto);
 
-            TempData["Mensaje"] =
+            TempData["MensajeProducto"] =
                 "Producto guardado correctamente ✅";
         }
         else
         {
             _productoRepo.Actualizar(Producto);
 
-            TempData["Mensaje"] =
+            TempData["MensajeProducto"] =
                 "Producto actualizado correctamente ✏️";
         }
 
@@ -151,7 +151,7 @@ public class ProductosModel : PageModel
 
         if (Producto.Id == 0)
         {
-            TempData["Mensaje"] =
+            TempData["MensajeProducto"] =
                 "Producto no encontrado ❌";
 
             return RedirectToPage(new { pageNumber });
@@ -183,7 +183,7 @@ public class ProductosModel : PageModel
             usuarioId,
             rol);
 
-        TempData["Mensaje"] =
+        TempData["MensajeProducto"] =
             "Producto eliminado 🗑️";
 
         return RedirectToPage(new { pageNumber });

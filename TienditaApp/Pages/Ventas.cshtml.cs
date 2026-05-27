@@ -153,7 +153,7 @@ public class VentasModel : PageModel
         {
             _ventaRepo.RegistrarVenta(Venta);
 
-            TempData["Mensaje"] =
+            TempData["MensajeVenta"] =
                 "Venta registrada correctamente ✅";
         }
         catch (Exception ex)
@@ -202,7 +202,7 @@ public class VentasModel : PageModel
         {
             _ventaRepo.ActualizarVenta(Venta);
 
-            TempData["Mensaje"] =
+            TempData["MensajeVenta"] =
                 "Venta actualizada correctamente ✅";
         }
         catch (Exception ex)

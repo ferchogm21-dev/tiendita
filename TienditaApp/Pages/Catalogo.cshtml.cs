@@ -20,11 +20,10 @@ namespace TienditaApp.Pages
 
         public void OnGet(string nombrenegocio)
         {
-            Nombrenegocio = nombrenegocio;
-
             Productos =
-                _productoRepo
-                    .ObtenerCatalogoPorSlug(Nombrenegocio);
+                _productoRepo.ObtenerCatalogoPorSlug(nombrenegocio);
+
+            ViewData["Negocio"] = nombrenegocio;
         }
     }
 }
